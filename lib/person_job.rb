@@ -6,9 +6,12 @@ class PersonJob < Struct.new(:person_id, :create_google_email, :create_twiki_acc
     error_message = ""
     if create_google_email && person.google_created.blank?
        password = 'just4now' + Time.now.to_f.to_s[-4,4] # just4now0428
-       status = person.create_google_email(password)
+
+       status = person.create_active_directory_account
+       #status = person.create_google_email(password)
        if status.is_a?(String)
-         error_message += "Google account not created for #{person.human_name}. " + status + " <br/>The password was " + password + "<br/><br/>"
+         error_message += "Active Directory account not created for #{person.human_name}. " + status + " <br/>The password was " + password + "<br/><br/>"
+         #error_message += "Google account not created for #{person.human_name}. " + status + " <br/>The password was " + password + "<br/><br/>"
        else
          # If we immediately send the email, google may say the account doesn't exist
          # Then send grid puts the user account on a black likst
@@ -17,7 +20,8 @@ class PersonJob < Struct.new(:person_id, :create_google_email, :create_twiki_acc
        end
     end
     if create_twiki_account && person.twiki_created.blank?
-      status = person.create_twiki_account
+      #status = person.create_twiki_account
+      status = true
       error_message +=  "TWiki account #{person.twiki_name} was not created.<br/><br/>" unless status
       status = person.reset_twiki_password
       error_message +=  'TWiki account password was not reset.<br/>' unless status
@@ -33,14 +37,14 @@ class PersonJob < Struct.new(:person_id, :create_google_email, :create_twiki_acc
  #     Delayed::Worker.logger.debug(error_message)
       puts error_message
       message = error_message
-      GenericMailer.email(
-        :to => ["help@sv.cmu.edu", "todd.sedano@sv.cmu.edu"],
-        :from => "help@sv.cmu.edu",
-        :subject => "PersonJob had an error on person id = #{person.id}",
-        :message => message,
-        :url_label => "Show which person",
-        :url => "http://whiteboard.sv.cmu.edu/people/#{person.id}" #+ person_path(person)
-      ).deliver
+      #GenericMailer.email(
+      #  :to => ["help@sv.cmu.edu", "todd.sedano@sv.cmu.edu"],
+      #  :from => "help@sv.cmu.edu",
+      #  :subject => "PersonJob had an error on person id = #{person.id}",
+      #  :message => message,
+      #  :url_label => "Show which person",
+      #  :url => "http://whiteboard.sv.cmu.edu/people/#{person.id}" #+ person_path(person)
+      #).deliver
     end
   end
 end

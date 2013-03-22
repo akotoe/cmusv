@@ -334,6 +334,41 @@ class User < ActiveRecord::Base
     return true
   end
 
+  #
+  # Creates an Active Directory account for the user
+  # If this fails, it returns an error message as a string
+  #
+  def create_active_directory_account
+    return "Empty email address" if self.email.blank?
+    logger.debug("Attempting to create active directory account for " + self.email)
+
+    domain = self.email.split('@')[1] # extract domain from email
+    base_dn = "dc=cmusv, dc=sv, dc=cmu, dc=local" # base dn for active directory domain
+
+    if domain != GOOGLE_DOMAIN
+      logger.debug("Domain (" + domain + ") is not the same as the google domain (" + GOOGLE_DOMAIN)
+      return "Domain (" + domain + ") is not the same as the google domain (" + GOOGLE_DOMAIN + ")"
+    end
+
+    dn = "cn=#{self.human_name}, cn=users, "+base_dn
+    attr = {
+        :cn => self.human_name,
+        :objectclass => ["top", "person", "organizationalPerson", "user"],
+        :sn => self.last_name,
+        :mail => self.email
+    }
+
+    begin
+      active_directory_connection.add(:dn=>dn,:attributes=>attr)
+
+    rescue e
+      # error format open
+      return e
+    end
+    # self.active_directory_created = Time.now()
+    self.save
+    return true
+  end
 
 #   def create_adobe_connect
 #     require 'mechanize'

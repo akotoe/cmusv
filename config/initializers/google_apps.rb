@@ -8,6 +8,7 @@ GOOGLE_DOMAIN = ENV['GOOGLE_DOMAIN'] || "sandbox.sv.cmu.edu"
 
 require 'gappsprovisioning/provisioningapi'
 include GAppsProvisioning
+
 def google_apps_connection
   @google_apps_connection ||= ProvisioningApi.new(GOOGLE_USERNAME, GOOGLE_PASSWORD)
 rescue
@@ -33,6 +34,15 @@ def switch_west_to_sv(email_address)
         email_address = name + "@sv.cmu.edu"
      end
      return email_address
+end
+
+def switch_sv_to_ad(email_address)
+  return nil if email_address.nil?
+  (name, domain) = email_address.split('@')
+  if(domain == "sv.cmu.edu")
+    email_address = name + "@ad.sv.cmu.edu"
+  end
+  return email_address
 end
 
 def pretty_print_google_error(e)
