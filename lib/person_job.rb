@@ -7,6 +7,7 @@ class PersonJob < Struct.new(:person_id, :create_google_email, :create_twiki_acc
     if create_google_email && person.google_created.blank?
        password = 'just4now' + Time.now.to_f.to_s[-4,4] # just4now0428
 
+       #changed gmail creation functionality to active directory creation
        status = person.create_active_directory_account
        #status = person.create_google_email(password)
        if status.is_a?(String)
@@ -34,9 +35,9 @@ class PersonJob < Struct.new(:person_id, :create_google_email, :create_twiki_acc
 
 
     if(!error_message.blank?)
- #     Delayed::Worker.logger.debug(error_message)
-      puts error_message
-      message = error_message
+      #Delayed::Worker.logger.debug(error_message)
+      #puts error_message
+      #message = error_message
       #GenericMailer.email(
       #  :to => ["help@sv.cmu.edu", "todd.sedano@sv.cmu.edu"],
       #  :from => "help@sv.cmu.edu",

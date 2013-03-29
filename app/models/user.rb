@@ -4,6 +4,7 @@ class User < ActiveRecord::Base
   devise :omniauthable, :rememberable, :trackable, :timeoutable
   #, :database_authenticatable, :registerable,
 
+
   # Setup accessible (or protected) attributes for your model
   attr_accessible :adobe_created, :biography, :email, :first_name, :github, :graduation_year, :human_name, :image_uri, :is_active, :is_adobe_connect_host, :is_alumnus, :is_part_time, :is_staff, :is_student, :last_name, :legal_first_name, :local_near_remote, :login, :masters_program, :masters_track, :msdnaa_created, :office, :office_hours, :organization_name, :personal_email, :photo_content_type, :photo_file_name, :pronunciation, :skype, :sponsored_project_effort_last_emailed, :strength1_id, :strength2_id, :strength3_id, :strength4_id, :strength5_id, :telephone1, :telephone1_label, :telephone2, :telephone2_label, :telephone3, :telephone3_label, :telephone4, :telephone4_label, :tigris, :title, :twiki_name, :user_text, :webiso_account, :work_city, :work_country, :work_state, :linked_in, :facebook, :twitter, :google_plus, :people_search_first_accessed_at, :is_profile_valid
   #These attributes are not accessible , :created_at, :current_sign_in_at, :current_sign_in_ip, :effort_log_warning_email, :google_created, :is_admin, :last_sign_in_at, :last_sign_in_ip, :remember_created_at,  :sign_in_count,  :sign_in_count_old,  :twiki_created,  :updated_at,  :updated_by_user_id,  :version,  :yammer_created, :course_tools_view, :course_index_view, :expires_at
@@ -339,32 +340,67 @@ class User < ActiveRecord::Base
   # If this fails, it returns an error message as a string
   #
   def create_active_directory_account
+    # reject blank emails
     return "Empty email address" if self.email.blank?
+
+    # log what is currently happening
     logger.debug("Attempting to create active directory account for " + self.email)
 
-    domain = self.email.split('@')[1] # extract domain from email
-    base_dn = "dc=cmusv, dc=sv, dc=cmu, dc=local" # base dn for active directory domain
+    # extract domain from email
+    domain = self.email.split('@')[1]
 
+    # Confirm domain name accuracy
     if domain != GOOGLE_DOMAIN
       logger.debug("Domain (" + domain + ") is not the same as the google domain (" + GOOGLE_DOMAIN)
       return "Domain (" + domain + ") is not the same as the google domain (" + GOOGLE_DOMAIN + ")"
     end
 
-    dn = "cn=#{self.human_name}, cn=users, "+base_dn
+    # Build attributes for new active directory user
+    base_dn = "dc=cmusv,dc=sv,dc=cmu,dc=local"
+    dn = "cn=#{self.human_name},"
+
+    # Build variable dn sections
+    if self.is_staff
+      dn+="ou=Staff,ou=Sync,"
+    elsif !self.masters_program.blank?
+      dn+= "ou="+self.masters_program+",ou=Students,ou=Sync,"
+    else
+      dn+="cn=Users, "
+    end
+
+    # Attach base dn
+    dn+=base_dn
+    logger.debug(dn)
+
+    # initialize attribute values
     attr = {
         :cn => self.human_name,
         :objectclass => ["top", "person", "organizationalPerson", "user"],
         :sn => self.last_name,
+        :displayName => self.human_name,
         :mail => self.email
     }
 
+    # try to transact against active directory, rescue any exceptions
     begin
-      active_directory_connection.add(:dn=>dn,:attributes=>attr)
+        # Establishes Standard/SSL connection to Active Directory server, returns an ldap connection
+        @connection = Net::LDAP.new(:host=>'10.0.0.130',
+                                 :port=>389,
+                                 :auth=>{
+                                     :method=>:simple,
+                                     :username=>'edward.akoto@cmusv.sv.cmu.local',
+                                     :password=>'Just4now'
+                                 })
 
-    rescue e
-      # error format open
+        @connection.add(:dn=>dn,:attributes=>attr)
+        logger.debug(@connection.get_operation_result)
+        logger.debug("Successful connection to active directory")
+    rescue Net::LDAP::LdapError=>e
+      #e = "Unsuccessful connection to active directory"
+      logger.debug(e)
       return e
     end
+
     # self.active_directory_created = Time.now()
     self.save
     return true
@@ -437,7 +473,4 @@ class User < ActiveRecord::Base
     end
     return true
   end
-
-
-
 end

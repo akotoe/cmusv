@@ -262,9 +262,11 @@ class PeopleController < ApplicationController
         #                              #          job.perform
         #
         #                              #        flash[:error] = error_message unless error_message.blank?
-        PersonJob.new(@person.id, params[:create_google_email], params[:create_twiki_account], params[:create_yammer_account]) unless params[:create_google_email].nil? && params[:create_twiki_account].nil? && params[:create_yammer_account].nil?
-                                      #          job = PersonJob.new(@person.id, params[:create_google_email], params[:create_twiki_account]) unless params[:create_google_email].nil? &&  params[:create_twiki_account].nil?
-                                      #          job.perform
+
+
+        #PersonJob.new(@person.id, params[:create_google_email], params[:create_twiki_account], params[:create_yammer_account]) unless params[:create_google_email].nil? && params[:create_twiki_account].nil? && params[:create_yammer_account].nil?
+                                              job = PersonJob.new(@person.id, params[:create_google_email], params[:create_twiki_account]) unless params[:create_google_email].nil? &&  params[:create_twiki_account].nil?
+                                              job.perform
 
                                       #        flash[:error] = error_message unless error_message.blank?
         flash[:notice] = 'Person was successfully created.'
