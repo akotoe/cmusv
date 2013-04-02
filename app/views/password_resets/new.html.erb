@@ -1,0 +1,27 @@
+<script type="text/javascript">
+    var RecaptchaOptions = {
+        theme : 'clean'
+    };
+</script>
+
+
+<% content_for :title, 'Whiteboard LMS for CMU-SV' %>
+
+<%= javascript_include_tag 'password_reset' %>
+
+<%# render :partial=>'rss_feeds/index', :locals => {:rss_feeds => @rss_feeds} %>
+
+<h1 xmlns="http://www.w3.org/1999/html">Reset account</h1>
+
+<form action="<%= password_resets_path %>" id="resetForm" method="post" role="reset">
+
+  <div>
+    <label for="s" class="screen-reader-text">Username (your email id ):</label>
+    <input type="text" id="email" name="email" value="">
+    <input type="submit" value="   Go   " id="resetsubmit">
+  </div>
+  </br>
+  <%= recaptcha_tags :ssl => true %>
+</form>
+
+

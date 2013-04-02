@@ -51,6 +51,7 @@ gem 'vpim'  # user for exporting contacts to vCard and iCalendar support
 gem 'seedbank'
 gem 'spreadsheet'
 
+gem "recaptcha", :require => "recaptcha/rails"
 
 group :production do
   gem 'thin'
