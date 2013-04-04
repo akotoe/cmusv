@@ -1,3 +1,5 @@
+# Pending tests
+
 class PasswordResetsController < ApplicationController
   layout 'cmu_sv'
   require 'activedirectory/activedirectory'
@@ -33,7 +35,7 @@ class PasswordResetsController < ApplicationController
   def update
     @user = User.find_by_password_reset_token!(params[:id])
     respond_to do |format|
-      if @user.password_reset_sent_at<2.hours.ago
+      if @user.password_reset_sent_at>2.hours.ago
         if params[:newPassword]
           if Ldap.authenticate
             message = process_request(@user, params[:newPassword])
@@ -50,7 +52,7 @@ class PasswordResetsController < ApplicationController
           end
         end
       else
-        flash[:error] = "Password reset link has expired"
+        flash[:error] = "Password reset link has expired #{@user.password_reset_sent_at}"+"#{2.hours.ago}"+"  #{@user.password_reset_sent_at < 2.hours.ago}"
         format.html {redirect_to new_password_reset_path}
       end
     end

@@ -463,6 +463,7 @@ class User < ActiveRecord::Base
     return attr
   end
 
+  # Pending tests
   def send_password_reset
     generate_token(:password_reset_token)
     self.password_reset_sent_at = Time.zone.now
@@ -470,6 +471,7 @@ class User < ActiveRecord::Base
     UserMailer.password_reset(self).deliver
   end
 
+  # Pending tests
   def generate_token(column)
     begin
       self[column] = SecureRandom.urlsafe_base64
