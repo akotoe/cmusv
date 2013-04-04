@@ -275,7 +275,7 @@ describe User do
     pending " returns true when active directory account is successfully created"
     pending " errors when no active directory connection can be established"
     pending " errors when an active directory transaction is unsuccessfully"
-    end
+
   end
 
 

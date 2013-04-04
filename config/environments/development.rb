@@ -39,13 +39,13 @@ CMUEducation::Application.configure do
     #:password => ENV['GMAIL_SMTP_PASSWORD'],
     #:enable_starttls_auto => true
 
-    # Configured this for test purposes
+    # Configured this for test purposes only
     :address => "smtp.gmail.com",
     :port => 587,
     :authentication => :plain,
     :domain => 'smtp.gmail.com',
-    :user_name => 'reriedwards@gmail.com',
-    :password => 'legranded',
+    :user_name => 'specify_username@gmail.com',
+    :password => 'specify_password',
     :enable_starttls_auto => true
 
   }

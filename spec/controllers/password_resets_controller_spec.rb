@@ -9,4 +9,6 @@ describe PasswordResetsController do
     end
   end
 
+  it "add pending tests"
+
 end

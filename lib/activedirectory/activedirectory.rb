@@ -11,7 +11,7 @@ class Ldap
     conn.host = '10.0.0.130'
     conn.port = 636 #389
     conn.encryption(:method=>:simple_tls)
-    conn.auth "edward.akoto@cmusv.sv.cmu.local", "Just4now" # Create a special account for this
+    conn.auth "username@cmusv.sv.cmu.local", "password" # Create a special account for this
     return conn
   end
 
