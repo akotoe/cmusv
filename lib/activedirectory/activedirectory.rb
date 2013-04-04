@@ -11,7 +11,7 @@ class Ldap
     conn.host = '10.0.0.130'
     conn.port = 636 #389
     conn.encryption(:method=>:simple_tls)
-    conn.auth "edward.akoto@cmusv.sv.cmu.local", "Just4now"
+    conn.auth "administrator@cmusv.sv.cmu.local", "Just4now88"
     return conn
   end
 

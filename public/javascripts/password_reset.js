@@ -1,10 +1,6 @@
-// This page contains all relevant JS for the password reset pages
-
-$(document).ready(function() {
-    $("#resetForm").submit(function (){
-         return validateResetForm()
-    });
-});
+/*
+*This page contains all relevant JS for the password reset pages
+*/
 
 
 // Helper function to validate reset form
@@ -16,8 +12,7 @@ function validateResetForm(){
     }
 }
 
-
-// Helper function to validate reset form
+// Helper function to validate edit form
 function validateEditForm(){
     var newPass = $("#newPassword").val()
     var oldPass = $("#confirmPassword").val()

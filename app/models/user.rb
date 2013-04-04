@@ -492,7 +492,7 @@ class User < ActiveRecord::Base
 
   def update_is_profile_valid
     if ((self.biography.blank? && self.facebook.blank? && self.twitter.blank? && self.google_plus.blank? && self.linked_in.blank?) or
-        (self.telephone1.blank? && self.telephone2.blank? && self.telephone3.blank? && self.telephone4.blank?))
+        (self.telephone1.blank? && self.telephone2.blank? && self.telephone3.blank? && self.telephone4.blank?)) && self.personal_email.blank?
       self.is_profile_valid = false
     else
       self.is_profile_valid= true

@@ -11,10 +11,12 @@ class PasswordResetsController < ApplicationController
   end
 
   def create
-    @user = User.find_by_email(params[:email])
+    @user = User.find_by_email(params[:primaryEmail])
     if verify_recaptcha(:model=>@user,:message=>"Verification code is wrong", :attribute=>"verification code")
-      @user.send_password_reset if @user
-      redirect_to new_password_reset_path, :notice => "Email sent with password reset instructions"
+      if @user && @user.personal_email == params[:personalEmail]
+        @user.send_password_reset
+      end
+      redirect_to root_url, :notice => "<div align='center'><b>Request sent!</b><br/> You will receive an email with password reset instructions if matching records are found. <br/></div>".html_safe
     else
       flash[:error] = "Verification code is wrong"
       redirect_to new_password_reset_path
@@ -24,31 +26,38 @@ class PasswordResetsController < ApplicationController
 
   def edit
     @user = User.find_by_password_reset_token!(params[:id])
+    rescue ActiveRecord::RecordNotFound
+      redirect_to new_password_reset_path, :flash => { :error => "Password reset link has expired" }
   end
 
   def update
     @user = User.find_by_password_reset_token!(params[:id])
-    if @user.password_reset_sent_at<2.hours.ago
-      redirect_to password_reset_path, :alert => "Password reset has expired"
-    elsif Ldap.authenticate
-      if params[:newPassword]
-        process_request(@user, params[:newPassword])
-        flash[:notice] = "Successful "
+    respond_to do |format|
+      if @user.password_reset_sent_at<2.hours.ago
+        if params[:newPassword]
+          if Ldap.authenticate
+            message = process_request(@user, params[:newPassword])
+            if message == "Success"
+              flash[:notice] = "Password has been reset!"
+              format.html {redirect_to root_url}
+            else
+              flash[:error]="Password does not meet required minimum complexity. Ensure to have a digit, a capital, and a minimum of eight characters."
+              redirect_to edit_password_reset_path and return
+            end
+          else
+            flash[:error] = "Cannot contact server."
+            format.html {redirect_to edit_password_reset_path}
+          end
+        end
+      else
+        flash[:error] = "Password reset link has expired"
+        format.html {redirect_to new_password_reset_path}
       end
-      redirect_to new_password_reset_path
-
-
-    else
-      flash[:error] = "Unsuccessful "
-      redirect_to new_password_reset_path
     end
   end
 
   # Transact against active directory
   def process_request(user, new_pass)
-    # Build dn
-    # Replace this with actual user dn
-    #dn = "cn=June Bobby, ou=SE, ou=Students, ou=Sync, dc=cmusv, dc=sv, dc=cmu,dc=local"
     dn = user.get_dn
 
     # Establish connection
@@ -57,13 +66,18 @@ class PasswordResetsController < ApplicationController
     # Reset password
     logger.debug("Resetting password" )
     con.replace_attribute dn, :unicodePwd, encode(new_pass)
-    logger.debug(con.get_operation_result )
+
+    # Build response
+    message = con.get_operation_result.message
+    logger.debug(message)
+    message
   end
 
   # Create unicode password
   def encode(pwd)
-    ret = ''
-    "\"#{pwd}\"".length.times {|i| ret+= "#{pwd[i..i]}\000"}
+    ret = ""
+    pwd = "\"" + pwd + "\""
+    pwd.length.times{|i| ret+= "#{pwd[i..i]}\000" }
     ret
   end
 end

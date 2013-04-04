@@ -9,19 +9,21 @@
 
 <%= javascript_include_tag 'password_reset' %>
 
-<%# render :partial=>'rss_feeds/index', :locals => {:rss_feeds => @rss_feeds} %>
-
 <h1 xmlns="http://www.w3.org/1999/html">Reset account</h1>
 
-<form action="<%= password_resets_path %>" id="resetForm" method="post" role="reset">
+<form action="<%= password_resets_path %>" id="resetForm" method="post" role="reset" onsubmit="return validateResetForm()">
 
   <div>
-    <label for="s" class="screen-reader-text">Username (your email id ):</label>
-    <input type="text" id="email" name="email" value="">
-    <input type="submit" value="   Go   " id="resetsubmit">
+    <label for="pe" class="screen-reader-text">Primary email</label> </br>
+    <input type="text" id="primaryEmail" name="primaryEmail" value="" placeholder="@sv.cmu.edu"></br> </br>
+    <label for="se" class="screen-reader-text">Secondary email</label> </br>
+    <input type="text" id="personalEmail" name="personalEmail" value=""></br> </br>
+    <%= recaptcha_tags :ssl => true %>
+    </br>
+    <input type="submit" value="   Go   " id="resetSubmit">
   </div>
   </br>
-  <%= recaptcha_tags :ssl => true %>
+
 </form>
 
 
