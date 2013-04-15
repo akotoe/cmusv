@@ -25,7 +25,7 @@ class PersonJob < Struct.new(:person_id, :create_google_email, :create_twiki_acc
       #status = person.create_twiki_account
       status = true
       error_message +=  "TWiki account #{person.twiki_name} was not created.<br/><br/>" unless status
-      status = person.reset_twiki_password
+      #status = person.reset_twiki_password
       error_message +=  'TWiki account password was not reset.<br/>' unless status
     end
 

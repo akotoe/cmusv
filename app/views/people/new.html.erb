@@ -56,7 +56,7 @@
           var email = prepare_for_google(first_name) + "." + prepare_for_google(last_name) + "@<%=@domain%>";
 
           // Update and validate email
-          document.forms["new_user"].user_twiki_name.value = twiki_name;
+          //document.forms["new_user"].user_twiki_name.value = twiki_name;
           document.forms["new_user"].user_email.value = email;
           check_email();
         }
@@ -176,11 +176,8 @@
   <% end %>
     -->
 
-    <p>
-      <%= f.label :twiki_name %><br/>
-      <%= f.text_field :twiki_name %>
-      <%= check_box_tag("create_twiki_account", 1, true) %> Create twiki account?
-    </p>
+
+
     <p>
       <%= f.label :email %><br/>
       <%= f.text_field :email, :onblur => "check_email()" %>

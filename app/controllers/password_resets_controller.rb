@@ -17,8 +17,11 @@ class PasswordResetsController < ApplicationController
     if verify_recaptcha(:model=>@user,:message=>"Verification code is wrong", :attribute=>"verification code")
       if @user && @user.personal_email == params[:personalEmail]
         @user.send_password_reset
+      else
+        flash[:error] = "Your entries do not match our records"
+        redirect_to new_password_reset_path and return
       end
-      redirect_to root_url, :notice => "<div align='center'><b>Request sent!</b><br/> You will receive an email with password reset instructions if matching records are found. <br/></div>".html_safe
+      redirect_to root_url, :notice => "Instructions have been sent to your secondary email account."
     else
       flash[:error] = "Verification code is wrong"
       redirect_to new_password_reset_path

@@ -16,6 +16,14 @@ function validateResetForm(){
 function validateEditForm(){
     var newPass = $("#newPassword").val()
     var oldPass = $("#confirmPassword").val()
-    return (newPass==oldPass) && newPass!=""
+    if ((newPass==oldPass) && newPass!="") {
+        return true
+    }else{
+        email_mismatching()
+        return false
+    }
+}
 
+function email_mismatching(){
+    $("#password_mismatch_warning").append($('<div/>').css('color', 'red').text('Password mismatch'));
 }

@@ -5,11 +5,15 @@ class Ldap
 
   # Configure parameters for an encrypted connection to LDAP server
   def self.configure
+    ad_host = ENV['AD_HOST'] || "10.0.0.130"
+    ad_user = ENV['AD_USER'] || "edward.akoto@cmusv.sv.cmu.local"
+    ad_password = ENV['AD_PASSWORD'] || "Just4now"
+
     conn = Net::LDAP.new
-    conn.host = '10.0.0.130' #LDAP host
+    conn.host = ad_host #LDAP host
     conn.port = 636 # 636 for SSL, 389 for non-SSL
     conn.encryption(:method=>:simple_tls)
-    conn.auth "edward.akoto@cmusv.sv.cmu.local", "Just4now" # Create a special account for this
+    conn.auth ad_user, ad_password # Create a special account for this
     return conn
   end
 
