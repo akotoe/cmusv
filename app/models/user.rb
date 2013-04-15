@@ -1,8 +1,5 @@
 class User < ActiveRecord::Base
 
-
-  require 'net/ldap'
-
   # Include default devise modules. Others available are:
   # :token_authenticatable, :encryptable, :confirmable, :lockable, :timeoutable and :omniauthable
   devise :omniauthable, :rememberable, :trackable, :timeoutable
@@ -343,7 +340,7 @@ class User < ActiveRecord::Base
 
   #
   # Creates an Active Directory account for the user
-  # If this fails, it returns an error message as a string
+  # If this fails, it returns an error message as a string, else it returns true
   #
   def create_active_directory_account
     # reject blank emails
@@ -366,12 +363,12 @@ class User < ActiveRecord::Base
         # Establishes Standard/SSL connection to Active Directory server, returns an ldap connection
         connection = Ldap.configure
 
-        # Add the user
+        # Add this user to active directory
         connection.add(:dn=>get_dn,:attributes=>get_attributes)
         logger.debug(connection.get_operation_result)
 
-        # Activate user account
-        connection.replace_attribute get_dn, :useraccountcontrol, "512"
+        # Activate user account #still not activating, I need to find out why so
+        connection.replace_attribute get_dn, :userAccountControl, "512"
         logger.debug(connection.get_operation_result)
 
     rescue Net::LDAP::LdapError=>e
@@ -428,14 +425,11 @@ class User < ActiveRecord::Base
   end
 
 
+  # This method builds a dn for this user
   def get_dn
-    # Build dn
     dn = "cn=#{self.human_name},"
-
-    # Build base dn
     base_dn = "dc=cmusv,dc=sv,dc=cmu,dc=local"
 
-    # Build variable dn sections
     if self.is_staff
       dn+="ou=Staff,ou=Sync,"
     elsif !self.masters_program.blank?
@@ -444,19 +438,19 @@ class User < ActiveRecord::Base
       dn+="cn=Sync, "
     end
 
-    # Attach base dn
     dn+=base_dn
     logger.debug(dn)
 
     return dn
   end
 
+  #  This method initializes attribute values for this user
   def get_attributes
-    # initialize attribute values
     attr = {
         :cn => self.human_name,
         :objectclass => ["top", "person", "organizationalPerson", "user"],
         :sn => self.last_name,
+        :givenName => self.first_name,
         :displayName => self.human_name,
         :mail => self.email
     }

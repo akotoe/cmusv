@@ -8,11 +8,12 @@ class PersonJob < Struct.new(:person_id, :create_google_email, :create_twiki_acc
        password = 'just4now' + Time.now.to_f.to_s[-4,4] # just4now0428
 
        #changed gmail creation functionality to active directory creation
-       status = person.create_active_directory_account
        #status = person.create_google_email(password)
+       status = person.create_active_directory_account
+
        if status.is_a?(String)
-         error_message += "Active Directory account not created for #{person.human_name}. " + status + " <br/>The password was " + password + "<br/><br/>"
          #error_message += "Google account not created for #{person.human_name}. " + status + " <br/>The password was " + password + "<br/><br/>"
+         error_message += "Active Directory account not created for #{person.human_name}. " + status + " <br/>The password was " + password + "<br/><br/>"
        else
          # If we immediately send the email, google may say the account doesn't exist
          # Then send grid puts the user account on a black likst

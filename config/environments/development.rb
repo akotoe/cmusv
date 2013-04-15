@@ -44,8 +44,8 @@ CMUEducation::Application.configure do
     :port => 587,
     :authentication => :plain,
     :domain => 'smtp.gmail.com',
-    :user_name => 'specify_username@gmail.com',
-    :password => 'specify_password',
+    :user_name => 'reriedwards@gmail.com',
+    :password => 'legranded',
     :enable_starttls_auto => true
 
   }

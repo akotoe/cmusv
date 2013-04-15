@@ -1,17 +1,15 @@
 require 'net/ldap'
 
+# This class establishes an encrypted connection to active directory, and authenticates users against active directory.
 class Ldap
 
-  base_dn = "ou=sync, dc=cmusv, dc=sv, dc=cmu, dc =local "
-
-  # Configure connection parameters
-  protected
+  # Configure parameters for an encrypted connection to LDAP server
   def self.configure
     conn = Net::LDAP.new
-    conn.host = '10.0.0.130'
-    conn.port = 636 #389
+    conn.host = '10.0.0.130' #LDAP host
+    conn.port = 636 # 636 for SSL, 389 for non-SSL
     conn.encryption(:method=>:simple_tls)
-    conn.auth "username@cmusv.sv.cmu.local", "password" # Create a special account for this
+    conn.auth "edward.akoto@cmusv.sv.cmu.local", "Just4now" # Create a special account for this
     return conn
   end
 
@@ -21,25 +19,7 @@ class Ldap
       Timeout::timeout(10) do
         return (self.configure.bind) ? true : false
       end
-    rescue Timeout::Error=>e
-      return false
-    end
-  end
-
-  # Search Active Directory, return results if successful, false if unsuccessful
-  def self.search(email_id)
-    filter = Net::LDAP::Filter.eq("mail", email_id)
-    if (self.authenticate)
-      self.configure.search(:base => base_dn, :filter => filter) do |entry|
-        debugger.log ("DN: #{entry.dn}")
-        entry.each do |attribute, values|
-          puts "   #{attribute}:"
-          values.each do |value|
-            puts "      --->#{value}"
-          end
-        end
-      end
-    else
+    rescue Timeout::Error
       return false
     end
   end
