@@ -1,6 +1,5 @@
 class User < ActiveRecord::Base
 
-  require 'activedirectory/activedirectory'
 
   # Include default devise modules. Others available are:
   # :token_authenticatable, :encryptable, :confirmable, :lockable, :timeoutable and :omniauthable
@@ -346,6 +345,7 @@ class User < ActiveRecord::Base
   # If this fails, it returns an error message as a string, else it returns true
   #
   def create_active_directory_account
+    require 'activedirectory/activedirectory'
     # reject blank emails
     return "Empty email address" if self.email.blank?
 
