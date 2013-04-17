@@ -4,7 +4,10 @@
     <% if @user.errors.any? %>
 
     <% end %>
-     </br>
+
+    <p>
+    Resetting password for <%=@user.human_name %>.
+    </p>
       <p>
         <label for="p" class="screen-reader-text">New password:</label><br/>
         <input type="password" id="newPassword" name="newPassword" value="">
@@ -13,5 +16,6 @@
         <label for="p" class="screen-reader-text">Confirm password:</label><br/>
         <input type="password" id="confirmPassword" name="confirmPassword" value="">
       </p>
+    <div id="password_mismatch_warning"></div> <br/>
     <div class="actions"><%= f.submit "Update Password", :onclick=>"return validateEditForm()" %></div>
 <% end %>

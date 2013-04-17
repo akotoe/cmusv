@@ -1,5 +1,7 @@
 class User < ActiveRecord::Base
 
+  require 'activedirectory/activedirectory'
+
   # Include default devise modules. Others available are:
   # :token_authenticatable, :encryptable, :confirmable, :lockable, :timeoutable and :omniauthable
   devise :omniauthable, :rememberable, :trackable, :timeoutable
@@ -51,6 +53,7 @@ class User < ActiveRecord::Base
 
   validates_uniqueness_of :webiso_account, :case_sensitive => false
   validates_uniqueness_of :email, :case_sensitive => false
+
 
   has_attached_file :photo, :storage => :s3, :styles => {:original => "", :profile => "150x200>"},
                     :s3_credentials => "#{Rails.root}/config/amazon_s3.yml", :path => "people/photo/:id/:style/:filename"
@@ -435,7 +438,7 @@ class User < ActiveRecord::Base
     elsif !self.masters_program.blank?
       dn+= "ou="+self.masters_program+",ou=Students,ou=Sync,"
     else
-      dn+="cn=Sync, "
+      dn+="ou=Sync, "
     end
 
     dn+=base_dn

@@ -12,7 +12,7 @@ gem 'mechanize'
 gem "webrobots", "~> 0.0.10", :git => 'git://github.com/knu/webrobots.git' #As of 7/1/2011, 0.0.10 was broken -- this is used by mechanize, when it works, remove this line
 
 gem 'omniauth', '0.3.0.rc3'
-gem 'devise'
+gem 'devise', "~>1.5.4"
 
 
 gem "ckeditor", "3.6.3"
