@@ -269,13 +269,9 @@ describe User do
     end
 
   context "can create_active_directory_account" do
-    before(:each) do
-      @student_sam = FactoryGirl.create(:student_sam)
-    end
     pending " returns true when active directory account is successfully created"
     pending " errors when no active directory connection can be established"
     pending " errors when an active directory transaction is unsuccessfully"
-
   end
 
 

@@ -5,7 +5,8 @@
 
 // Helper function to validate reset form
 function validateResetForm(){
-    if ($("#email").val()==""){
+    if ( ($("#primaryEmail").val()=="") || ($("#personalEmail").val()=="")  ){
+        warn_blank_fields()
         return false
     } else{
         return true
@@ -19,11 +20,19 @@ function validateEditForm(){
     if ((newPass==oldPass) && newPass!="") {
         return true
     }else{
-        email_mismatching()
+        warn_password_mismatch()
         return false
     }
 }
 
-function email_mismatching(){
+// Warn if password mismatches
+function warn_password_mismatch(){
+    $("#password_mismatch_warning").empty()
     $("#password_mismatch_warning").append($('<div/>').css('color', 'red').text('Password mismatch'));
+}
+
+// Warn if email fields are blank
+function warn_blank_fields(){
+    $("#blank_email_warning").empty()
+    $("#blank_email_warning").append($('<div/>').css('color', 'red').text('Blank fields are not allowed'));
 }
