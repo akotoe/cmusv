@@ -20,6 +20,7 @@ function validateEditForm(){
     if ((newPass==oldPass) && newPass!="") {
         return true
     }else{
+
         warn_password_mismatch()
         return false
     }

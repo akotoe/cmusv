@@ -28,7 +28,9 @@ CMUEducation::Application.configure do
   ActionMailer::Base.perform_deliveries = true
 
   #config.action_mailer.default_url_options = { :host => "localhost:3000" }
+
   config.action_mailer.default_url_options = { :host => "10.0.1.59:3000" } # configure appropriately
+
 
 
   ActionMailer::Base.smtp_settings = {
@@ -45,8 +47,11 @@ CMUEducation::Application.configure do
     :port => 587,
     :authentication => :plain,
     :domain => 'smtp.gmail.com',
+
     :user_name => ENV['GMAIL_SMTP_USER'] || "whiteboard@cmu_domain",
     :password => ENV['GMAIL_SMTP_PASSWORD'] || "secret",
+
+
     :enable_starttls_auto => true
 
   }
