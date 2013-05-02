@@ -20,12 +20,12 @@ describe PagesController do
       end
     end
 
-    describe "GET index" do
-      it "assigns all pages as @pages" do
-        get :index
-        assigns(:pages).should_not be_nil
+      describe "GET index" do
+        it "assigns all pages as @pages" do
+          get :index
+          assigns(:pages).should_not be_nil
+        end
       end
-    end
 
     describe "GET show" do
       before do

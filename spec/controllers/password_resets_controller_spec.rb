@@ -2,14 +2,10 @@ require 'spec_helper'
 
 describe PasswordResetsController do
 
-  describe "GET 'new'" do
-    it "should be successful" do
-      get 'new'
-      response.should be_success
+  describe 'GET index' do
+    it 'should redirect to new password resets path' do
     end
   end
-
-  it "index should redirect to new password reset path"
 
   describe "create" do
     it 'should send password reset if recaptcha and personal email are verified'
@@ -20,8 +16,15 @@ describe PasswordResetsController do
   end
 
   describe "edit" do
-    it 'should redirect to new password reset path if reset_link has expired'
-    it 'should flash error if reset_link has expired'
+    before do
+      get :edit, :id => "non_invalid_url"
+    end
+    it 'should redirect to new password reset path if reset_link has expired' do
+      response.should redirect_to(new_password_reset_path)
+    end
+    it 'should flash error if reset_link has expired' do
+      flash[:error].should == "Password reset link has expired"
+    end
   end
 
   describe "update" do
