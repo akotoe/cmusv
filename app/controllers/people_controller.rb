@@ -232,36 +232,18 @@ class PeopleController < ApplicationController
       @person.user_text = "<h2>About Me</h2><p>I'd like to accomplish the following three goals (professional or personal) by the time I graduate:<ol><li>Goal 1</li><li>Goal 2</li><li>Goal 3</li></ol></p>"
     end
 
-
     respond_to do |format|
-
-#      error_message = ""
-#      if params[:create_google_email]
-#         password = 'just4now' + Time.now.to_f.to_s[-4,4] # just4now0428
-#         status = @person.create_google_email(password)
-#         if status.is_a?(String)
-#           error_message += "Google account not created. " + status + "</br></br>"
-#         else
-#          send_email([@person.personal_email, @person.email], @person.email, generate_message(@person, password))
-#         end
-#      end
-#      if params[:create_twiki_account]
-#        status = @person.create_twiki_account
-#        error_message +=  'TWiki account was not created.<br/></br>' unless status
-#        status = @person.reset_twiki_password
-#        error_message +=  'TWiki account password was not reset.</br>' unless status
-#      end
-
       if @person.save
-
         #Delayed::Job.enqueue(PersonJob.new(@person.id, params[:create_google_email], params[:create_twiki_account], params[:create_yammer_account])) unless params[:create_google_email].nil? && params[:create_twiki_account].nil? && params[:create_yammer_account].nil?
-                                                job = PersonJob.new(@person.id, params[:create_google_email], params[:create_twiki_account]) unless params[:create_google_email].nil? &&  params[:create_twiki_account].nil?
-                                                job.perform
-        #
-        #                              #        flash[:error] = error_message unless error_message.blank?
-
-        flash[:notice] = 'Person was successfully created.'
-        format.html { redirect_to(@person) }
+        job = PersonJob.new(@person.id, params[:create_google_email], params[:create_twiki_account]) unless params[:create_google_email].nil? &&  params[:create_twiki_account].nil?
+        #job.perform
+        if params[:account_creation_type]=="staged"
+          PersonMailer.welcome_email(@person, @person.generate_initial_password).deliver
+          flash[:notice] = 'Account has been staged for creation. To complete the account creation process, an email has been sent to '+@person.personal_email+"."
+          format.html { redirect_to(@person)  }
+        else
+          format.html { redirect_to edit_person_path(@person) }
+        end
         format.xml { render :xml => @person, :status => :created, :location => @person }
       else
         format.html { render :action => "new" }
@@ -665,5 +647,4 @@ class PeopleController < ApplicationController
         return ""
     end
   end
-
 end

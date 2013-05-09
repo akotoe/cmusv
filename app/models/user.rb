@@ -468,12 +468,18 @@ class User < ActiveRecord::Base
     UserMailer.password_reset(self).deliver
   end
 
-  # Pending tests
+  # Generate a password reset token
   def generate_token(column)
     begin
       self[column] = SecureRandom.urlsafe_base64
     end while User.exists?(column => self[column])
   end
+
+  # Generate initial password
+  def generate_initial_password
+    password = 'just4now' + Time.now.to_f.to_s[-4,4] # just4now0428
+  end
+
 
   protected
   def person_before_save
