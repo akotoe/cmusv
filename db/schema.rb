@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130401193544) do
+ActiveRecord::Schema.define(:version => 20130509151753) do
 
   create_table "assignments", :force => true do |t|
     t.string   "name"
@@ -628,6 +628,7 @@ ActiveRecord::Schema.define(:version => 20130401193544) do
     t.string   "auth_token"
     t.string   "password_reset_token"
     t.datetime "password_reset_sent_at"
+    t.datetime "directory_enabled_at"
   end
 
   create_table "users", :force => true do |t|
@@ -709,6 +710,7 @@ ActiveRecord::Schema.define(:version => 20130401193544) do
     t.string   "auth_token"
     t.string   "password_reset_token"
     t.datetime "password_reset_sent_at"
+    t.datetime "directory_enabled_at"
   end
 
   add_index "users", ["email"], :name => "index_users_on_email"

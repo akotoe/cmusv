@@ -6,9 +6,9 @@ class Ldap
   # Configure parameters for an encrypted connection to LDAP server
   def self.configure
 
-    ad_host = "ad_host"
-    ad_user = "ad_username@domain"
-    ad_password = "secret"
+    ad_host = "10.0.0.130"
+    ad_user = "edward.akoto@cmusv.sv.cmu.local"
+    ad_password = "Just4now"
 
     conn = Net::LDAP.new
     conn.host = ad_host #LDAP host

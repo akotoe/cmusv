@@ -10,7 +10,7 @@ class PeopleController < ApplicationController
 
   ; private(:controller)
 
-  before_filter :authenticate_user!, :except => [:show_by_twiki]
+  before_filter :authenticate_user!, :except => [:show_by_twiki, :init_account, :update]
 
 # Floating box source: http://roshanbh.com.np/2008/07/top-floating-message-box-using-jquery.html
 
@@ -174,6 +174,21 @@ class PeopleController < ApplicationController
     end
   end
 
+  # GET /people/init/random/edit
+  def init_account
+    @person = User.find_by_auth_token!(params[:auth_token])
+    @strength_themes = StrengthTheme.all
+
+    # Block link if active directory is already created
+    if @person.is_directory_enabled?
+      redirect_to root_url, :flash => { :error => "Account creation link has expired. Please contact Technical Operations" } and return
+    end
+
+    # Rescue if link is invalid
+    rescue ActiveRecord::RecordNotFound
+      redirect_to root_url, :flash => { :error => "Account creation link has expired. Please contact Technical Operations" } and return
+  end
+
   #http://localhost:3000/people/new?first_name=Todd&last_name=Sedano&webiso_account=at33@andrew.cmu.edu&is_student=true&program=ECE&expires_at=2013-01-01
 
   # GET /people/new
@@ -209,7 +224,6 @@ class PeopleController < ApplicationController
   # GET /people/1/edit
   def edit
     @person = User.find_by_param(params[:id])
-
     unless @person.id == current_user.id or current_user.is_admin?
       flash[:error] = "You're not allowed to edit this user's profile."
       redirect_to user_path(@person)
@@ -258,20 +272,26 @@ class PeopleController < ApplicationController
     @person = User.find_by_param(params[:id])
     # authorize! :update, @person
 
-    Rails.logger.info("People#update #{request.env["REQUEST_PATH"]} #{current_user.human_name} #{params}")
+    #Rails.logger.info("People#update #{request.env["REQUEST_PATH"]} #{current_user.human_name} #{params}")
 
-    @person.updated_by_user_id = current_user.id
+    @person.updated_by_user_id = current_user.id if current_user
     @strength_themes = StrengthTheme.all
 
     respond_to do |format|
       @person.attributes = params[:user]
-      @person.photo = params[:user][:photo] if can? :upload_photo, User
-      @person.expires_at = params[:user][:expires_at] if current_user.is_admin?
+      @person.photo = params[:user][:photo]
+      @person.expires_at = params[:user][:expires_at] if current_user && current_user.is_admin?
 
       if @person.save
         unless @person.is_profile_valid
           flash[:error] = "Please update your (social handles or biography) and your contact information"
         end
+
+        # Create active directory account if not yet created
+        if params[:active_directory]=="true"
+          @person.create_active_directory_account
+        end
+
         flash[:notice] = 'Person was successfully updated.'
         format.html { redirect_to(@person) }
         format.xml { head :ok }

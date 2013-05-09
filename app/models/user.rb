@@ -345,24 +345,25 @@ class User < ActiveRecord::Base
   # If this fails, it returns an error message as a string, else it returns true
   #
   def create_active_directory_account
-    require 'activedirectory/activedirectory'
-    # reject blank emails
-    return "Empty email address" if self.email.blank?
+    if !is_directory_enabled?
+      require 'activedirectory/activedirectory'
+      # reject blank emails
+      return "Empty email address" if self.email.blank?
 
-    # log what is currently happening
-    logger.debug("Attempting to create active directory account for " + self.email)
+      # log what is currently happening
+      logger.debug("Attempting to create active directory account for " + self.email)
 
-    # extract domain from email
-    domain = self.email.split('@')[1]
+      # extract domain from email
+      domain = self.email.split('@')[1]
 
-    # Confirm domain name accuracy
-    if domain != GOOGLE_DOMAIN
-      logger.debug("Domain (" + domain + ") is not the same as the google domain (" + GOOGLE_DOMAIN)
-      return "Domain (" + domain + ") is not the same as the google domain (" + GOOGLE_DOMAIN + ")"
-    end
+      # Confirm domain name accuracy
+      if domain != GOOGLE_DOMAIN
+        logger.debug("Domain (" + domain + ") is not the same as the google domain (" + GOOGLE_DOMAIN)
+        return "Domain (" + domain + ") is not the same as the google domain (" + GOOGLE_DOMAIN + ")"
+      end
 
-    # Try to transact against active directory, rescue any exceptions
-    begin
+      # Try to transact against active directory, rescue any exceptions
+      begin
         # Establishes Standard/SSL connection to Active Directory server, returns an ldap connection
         connection = Ldap.configure
 
@@ -374,32 +375,16 @@ class User < ActiveRecord::Base
         connection.replace_attribute get_dn, :userAccountControl, "512"
         logger.debug(connection.get_operation_result)
 
-    rescue Net::LDAP::LdapError=>e
-      logger.debug(e)
-      return e
+      rescue Net::LDAP::LdapError=>e
+        logger.debug(e)
+        return e
+      end
+      self.directory_enabled_at = Time.now()
+      self.save
+      return true
     end
-    # self.active_directory_created = Time.now()
-    self.save
-    return true
+
   end
-
-#   def create_adobe_connect
-#     require 'mechanize'
-#     agent = Mechanize.new
-#     agent.get(ADOBE_CONNECT_NEW_USER_URL) do |login_page|
-#       login_page.login = ADOBE_CONNECT_USERNAME
-#       login_page.password = ADOBE_CONNECT_PASSWORD
-#       reset_result_page = page.form_with(:action => '/do/resetpasswd/Main/WebHome') do |reset_page|
-#           reset_page.LoginName = self.twiki_name
-#       end.submit
-#
-#       return false if reset_result_page.parser.css('.patternTopic h3').text == " Password reset failed "
-#       return true if reset_result_page.link_with(:text => 'change password')
-#
-#       return true
-#     end
-#   end
-
 
 # attribute :github
 # If the user has not set this attribute, then ask the user to do so
@@ -460,6 +445,15 @@ class User < ActiveRecord::Base
     return attr
   end
 
+  # Check whether user is active directory enabled
+  def is_directory_enabled?
+    if self.directory_enabled_at.nil?
+      return false
+    else
+      return true
+    end
+  end
+
   # Pending tests
   def send_password_reset
     generate_token(:password_reset_token)
@@ -504,5 +498,7 @@ class User < ActiveRecord::Base
     end
     return true
   end
+
+
 
 end

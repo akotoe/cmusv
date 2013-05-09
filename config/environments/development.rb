@@ -27,9 +27,9 @@ CMUEducation::Application.configure do
   #ActionMailer::Base.perform_deliveries = false
   ActionMailer::Base.perform_deliveries = true
 
-  #config.action_mailer.default_url_options = { :host => "localhost:3000" }
+  config.action_mailer.default_url_options = { :host => "localhost:3000" }
 
-  config.action_mailer.default_url_options = { :host => "10.0.1.59:3000" } # configure appropriately
+  #config.action_mailer.default_url_options = { :host => "10.0.1.59:3000" } # configure appropriately
 
 
 

@@ -162,6 +162,11 @@ CMUEducation::Application.routes.draw do
   # password reset pages
   match '/password_resets' => 'password_resets#new', :as => :reset
 
+  match '/people/init/:auth_token/edit' => 'people#init_account', :as => :my_teams
+
+
+
+
 
 end
 

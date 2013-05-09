@@ -29,12 +29,14 @@ class PasswordResetsController < ApplicationController
 
   end
 
+  # Presents the link to reset password
   def edit
     @user = User.find_by_password_reset_token!(params[:id])
     rescue ActiveRecord::RecordNotFound
       redirect_to new_password_reset_path, :flash => { :error => "Password reset link has expired" }
   end
 
+  # Performs actual password reset
   def update
     @user = User.find_by_password_reset_token!(params[:id])
     respond_to do |format|
@@ -64,14 +66,11 @@ class PasswordResetsController < ApplicationController
   # Transact against active directory
   def process_request(user, new_pass)
     dn = user.get_dn
-
     # Establish connection
     con = Ldap.configure
-
     # Reset password
     logger.debug("Resetting password" )
     con.replace_attribute dn, :unicodePwd, encode(new_pass)
-
     # Build response
     message = con.get_operation_result.message
     logger.debug(message)
