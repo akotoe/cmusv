@@ -252,7 +252,7 @@ class PeopleController < ApplicationController
         job = PersonJob.new(@person.id, params[:create_google_email], params[:create_twiki_account]) unless params[:create_google_email].nil? &&  params[:create_twiki_account].nil?
         #job.perform
         if params[:account_creation_type]=="staged"
-          PersonMailer.welcome_email(@person, @person.generate_initial_password).deliver
+          PersonMailer.welcome_email(@person).deliver
           flash[:notice] = 'Account has been staged for creation. To complete the account creation process, an email has been sent to '+@person.personal_email+"."
           format.html { redirect_to(@person)  }
         else
@@ -281,8 +281,9 @@ class PeopleController < ApplicationController
       @person.attributes = params[:user]
       @person.photo = params[:user][:photo]
       @person.expires_at = params[:user][:expires_at] if current_user && current_user.is_admin?
-
-      if @person.save
+      @person.generate_token(:password_reset_token)
+      @person.password_reset_sent_at = Time.zone.now
+      if @person.save!
         unless @person.is_profile_valid
           flash[:error] = "Please update your (social handles or biography) and your contact information"
         end
@@ -292,8 +293,8 @@ class PeopleController < ApplicationController
           @person.create_active_directory_account
         end
 
-        flash[:notice] = 'Person was successfully updated.'
-        format.html { redirect_to(@person) }
+        flash[:notice] = 'Profile was successfully updated. Go ahead and create a password'
+        format.html { redirect_to edit_password_reset_path(@person.password_reset_token) }
         format.xml { head :ok }
       else
         format.html { render :action => "edit" }

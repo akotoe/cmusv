@@ -4,14 +4,22 @@ class PersonMailer < ActionMailer::Base
           #:bcc => 'todd.sedano@sv.cmu.edu',
           :subject => 'Welcome to Carnegie Mellon University Silicon Valley'
 
-  def welcome_email(person, password, options = {})
+  def welcome_email(person, options = {})
     @person = person
-    @password = password
 
     mail(:to => [@person.personal_email],
          :subject => options[:subject] || "Welcome to Carnegie Mellon University Silicon Valley (" + @person.email + ")",
          :date => Time.now)
     #mail :to => person.personal_email, :subject => "Whiteboard Password Reset"
+  end
+
+  def account_complete(person, options = {})
+    @person = person
+
+    mail(:to => [@person.personal_email],
+         :subject => options[:subject] || "Account information (" + @person.email + ")",
+         :date => Time.now)
+
   end
 
 end

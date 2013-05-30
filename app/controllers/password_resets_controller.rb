@@ -32,8 +32,8 @@ class PasswordResetsController < ApplicationController
   # Presents the link to reset password
   def edit
     @user = User.find_by_password_reset_token!(params[:id])
-    rescue ActiveRecord::RecordNotFound
-      redirect_to new_password_reset_path, :flash => { :error => "Password reset link has expired" }
+    #rescue ActiveRecord::RecordNotFound
+    #  redirect_to new_password_reset_path, :flash => { :error => "Password reset link has expired" }
   end
 
   # Performs actual password reset
@@ -45,10 +45,11 @@ class PasswordResetsController < ApplicationController
           if Ldap.authenticate
             message = process_request(@user, params[:newPassword])
             if message == "Success"
-              flash[:notice] = "Password has been reset!"
+              flash[:notice] = "Operation successful!"
+              PersonMailer.account_complete(@user).deliver
               format.html {redirect_to root_url}
             else
-              flash[:error]="Password does not meet required minimum complexity. Ensure to have a digit, a capital, and a minimum of eight characters."
+              flash[:error]="Password does not meet required minimum complexity. Read instructions below."
               redirect_to edit_password_reset_path and return
             end
           else

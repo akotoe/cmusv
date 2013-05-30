@@ -379,7 +379,7 @@ class User < ActiveRecord::Base
         logger.debug(e)
         return e
       end
-      self.directory_enabled_at = Time.now()
+      #self.directory_enabled_at = Time.now()
       self.save
       return true
     end
@@ -447,11 +447,7 @@ class User < ActiveRecord::Base
 
   # Check whether user is active directory enabled
   def is_directory_enabled?
-    if self.directory_enabled_at.nil?
-      return false
-    else
-      return true
-    end
+    false
   end
 
   # Pending tests

@@ -56,7 +56,7 @@
             var email = prepare_for_google(first_name) + "." + prepare_for_google(last_name) + "@<%=@domain%>";
 
             // Update and validate email
-            //document.forms["new_user"].user_twiki_name.value = twiki_name;
+            document.forms["new_user"].user_twiki_name.value = twiki_name;
             document.forms["new_user"].user_email.value = email;
             check_email();
         }
@@ -119,36 +119,34 @@
             add_loader(node, 'Checking account...');
         }
 
-        // Updates the graduation year of a student 
+        // Updates the graduation year of a student
         function update_graduation_year() {
             now = new Date;
             offset = 1;
-            if (document.forms["new_user"].user_is_part_time.checked == true) {
+            if ($("#is_part_time").val()==1) {
                 offset = 2
             }
-            if (document.forms["new_user"].user_is_student.checked == true) {
-                document.forms["new_user"].user_graduation_year.value = (now.getFullYear() + offset);
+            if ($("#is_student").val()==1) {
+                $("#graduation_year").value = (now.getFullYear() + offset);
             } else {
-                document.forms["new_user"].user_graduation_year.value = "";
+                $("#graduation_year").value = "";
             }
         }
 
         // Toggles student parameters
         function toggle_student_parameters(){
-            //update_graduation_year()
+            update_graduation_year()
             $("#student_parameters").slideToggle()
         }
 
         // Toggles graduation track
         function toggle_masters_track(){
-            if($("#graduation_program").val()=="SE"){
-                $("#masters_track_parameters").fadeIn()
-            }else {
-                $("#masters_track_parameters").fadeOut()
+            if($("#graduation_program").selected=="SE"){
+                $("#masters_track_parameters").slideToggle()
             }
 
-
         }
+
     </script>
 
 <% end %>
@@ -165,103 +163,83 @@
           </ul>
         </div>
     <% end %>
-    <%= field_set_tag nil, :class=>'cmu_table', do %>
-        <p>
-          <%= f.label :first_name, "Preferred first name" %><br/>
-          <%= f.text_field :first_name, :onblur => "update_twiki_and_email()" %>
-        </p>
-        <p>
-          <%= f.label :legal_first_name %><br/>
-          <%= f.text_field :legal_first_name %><br/>
-          <span class="help_text">(Ok to leave blank)</span>
-        </p>
-        <p>
-          <%= f.label :last_name %><br/>
-          <%= f.text_field :last_name, :onblur => "update_twiki_and_email()" %>
-        </p>
-        <p>
-          <%= f.label :twiki_name %><br/>
-          <%= f.text_field :twiki_name %>
-          <%= check_box_tag("create_twiki_account", 1, true) %> Create twiki account?
-        </p>
-        <p>
-          <%= f.label :email %><br/>
-          <%= f.text_field :email, :onblur => "check_email()" %>
-          <%= check_box_tag("create_google_email", 1, true) %> Create google email account?
-          <%= check_box_tag("create_active_directory_account", 1, false) %> Create active directory account?
-        <div id="email_warning"></div>
-        </p>
-        <p>
-          <%= f.label :webiso_account, "Andrew account" %><br/>
-          <%= f.text_field :webiso_account, :onblur => "check_webiso_account()", :placeholder => "@andrew.cmu.edu" %>
-        <div id="webiso_account_warning"></div>
-        </p>
-        <p>
-          <%= f.label :personal_email %><br/>
-          <%= f.text_field :personal_email %><br/>
-          <span class="help_text">(Necessary for google email account creation)</span>
-        </p>
-    <% end %>
+
+    <p>
+      <%= f.label :first_name, "Preferred first name" %><br/>
+      <%= f.text_field :first_name, :onblur => "update_twiki_and_email()" %>
+    </p>
+    <p>
+      <%= f.label :legal_first_name %><br/>
+      <%= f.text_field :legal_first_name %><br/>
+      <span class="help_text">(Ok to leave blank)</span>
+    </p>
+    <p>
+      <%= f.label :last_name %><br/>
+      <%= f.text_field :last_name, :onblur => "update_twiki_and_email()" %>
+    </p>
+    <p>
+      <%= f.label :twiki_name %><br/>
+      <%= f.text_field :twiki_name %>
+      <%= check_box_tag("create_twiki_account", 1, true) %> Create twiki account?
+    </p>
+    <p>
+      <%= f.label :email %><br/>
+      <%= f.text_field :email, :onblur => "check_email()" %>
+      <%= check_box_tag("create_google_email", 1, true) %> Create google email account?
+      <%= check_box_tag("create_active_directory_account", 1, false) %> Create active directory account?
+    <div id="email_warning"></div>
+    </p>
+    <p>
+      <%= f.label :webiso_account, "Andrew account" %><br/>
+      <%= f.text_field :webiso_account, :onblur => "check_webiso_account()", :placeholder => "@andrew.cmu.edu" %>
+    <div id="webiso_account_warning"></div>
+    </p>
+    <p>
+      <%= f.label :personal_email %><br/>
+      <%= f.text_field :personal_email %><br/>
+      <span class="help_text">(Necessary for google email account creation)</span>
+    </p>
 
     <h2>System Roles</h2>
-    <%= field_set_tag nil, :class=>'cmu_table', do %>
-        <p>
-          <%= f.check_box :is_staff %>
-          <%= f.label :is_staff, "Is staff or faculty?" %>
-        </p>
-        <p>
-          <%= check_box_tag("is_student", 1, true, :onchange => "toggle_student_parameters()") %>
-          <%= f.label :is_student, "Is a student?" %>
-        </p>
-        <p>
-          <%= f.check_box :is_active %>
-          <%= f.label :is_active, "Is active? - a current user?" %>
-        </p>
-    <% end %>
+    <p>
+      <%= f.check_box :is_staff %>
+      <%= f.label :is_staff, "Is staff or faculty?" %>
+    </p>
+    <p>
+      <%= check_box_tag("is_student", 1, true, :onchange => "toggle_student_parameters()") %>
+      <%= f.label :is_student, "Is a student?" %>
+    </p>
+    <p>
+      <%= f.check_box :is_active %>
+      <%= f.label :is_active, "Is active? - a current user?" %>
+    </p>
     <div id="student_parameters">
-        <h2>Student options</h2>
-        <%= field_set_tag nil, :class=>'cmu_table', do %>
-              <p>
-                <%= check_box_tag("is_part_time", 1, true, :onchange => "update_graduation_year()") %> Is part time student?
-              </p>
-              <p>
-                <%= select_tag :graduation_year, options_for_select((2013..2030).to_a), :style => "width:70px" %> Graduation year
-              </p>
-              <p>
-                <%= select_tag :graduation_program, options_for_select(["SM", "SE", "INI", "PhD"]), :style => "width:70px", :onchange=>"toggle_masters_track()" %> Graduate program
-              </p>
-              <div id="masters_track_parameters" hidden>
-                <%= select_tag :masters_track, options_for_select(["Tech","DM"]), :style => "width:70px" %> Graduate track
-              </div>
-
-        <% end %>
+      <h2>Student options</h2>
+      <p>
+        <%= check_box_tag("is_part_time", 1, true, :onchange => "update_graduation_year()") %> Is part time student?
+      </p>
+      <p>
+        <%= select_tag :graduation_year, options_for_select((2013..2030).to_a), :style => "width:70px" %> Graduation year
+      </p>
+      <p>
+        <%= select_tag :graduation_program, options_for_select(["SE", "SM", "INI", "PhD"]), :style => "width:70px", :onchange=>"toggle_masters_track()" %> Graduate program
+      </p>
+      <div id="masters_track_parameters">
+        <%= select_tag :masters_track, options_for_select(["Tech","DM","IS", "MOB","SM"]), :style => "width:70px" %> Graduate track
+      </div>
     </div>
     <h2>Account Termination</h2>
-    <%= field_set_tag nil, :class=>'cmu_table', do %>
-        <p>
-          <%= f.label "Expires at" %>
-          <%= f.text_field :expires_at, :size => 10 %><br/>
-          <% help_text = AcademicCalendar.next_semester + " semester starts on " + AcademicCalendar.date_for_semester_start(AcademicCalendar.next_semester, AcademicCalendar.next_semester_year).to_s %>
-          <span class="help_text">(<%= help_text %>)</span>
-        </p>
-    <% end %>
+    <p>
+      <%= f.label "Expires at" %>
+      <%= f.text_field :expires_at, :size => 10 %><br/>
+      <% help_text = AcademicCalendar.next_semester + " semester starts on " + AcademicCalendar.date_for_semester_start(AcademicCalendar.next_semester, AcademicCalendar.next_semester_year).to_s %>
+      <span class="help_text">(<%= help_text %>)</span>
+    </p>
 
-    <!-- Added this section for specifying the account creation process type -->
-    <h2>Account Creation Process Type</h2>
-    <%= field_set_tag nil, :class=>'cmu_table', do %>
-        <p>
-          Staged <br/>
-          <%= radio_button_tag(:account_creation_type, "staged", :true) %>
-        </p>
-        <p>
-          Express <br/>
-          <%= radio_button_tag(:account_creation_type, "express") %>
-        </p>
-    <% end %>
-    <br/>
 
     <%= f.submit "Create" %>
     </p>
 <% end %>
 
 <%= link_to 'Back', people_path %>
+

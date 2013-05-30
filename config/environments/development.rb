@@ -48,7 +48,7 @@ CMUEducation::Application.configure do
     :authentication => :plain,
     :domain => 'smtp.gmail.com',
     :user_name => ENV['GMAIL_SMTP_USER'] || "reriedwards@gmail.com",
-    :password => ENV['GMAIL_SMTP_PASSWORD'] || "legranded",
+    :password => ENV['GMAIL_SMTP_PASSWORD'] || "ujumbeQute4",
     :enable_starttls_auto => true
 
   }
