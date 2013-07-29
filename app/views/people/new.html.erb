@@ -211,14 +211,13 @@
         <p>
           <%= f.label :twiki_name %><br/>
           <%= f.text_field :twiki_name %>
-          <%= check_box_tag("create_twiki_account", 1, false) %> Create twiki account?
         </p>
         <p>
           <%= f.label :email %><br/>
           <%= f.text_field :email, :onblur => "check_email()" %>
           <!-- We will be creating google app accounts through Active Directory
       <%#= check_box_tag("create_google_email", 1, true) %> Create google email account? -->
-          <%= check_box_tag("create_active_directory_account", 1, false) %> Create active directory account?
+
         <div id="email_warning"></div>
         </p>
         <p>
