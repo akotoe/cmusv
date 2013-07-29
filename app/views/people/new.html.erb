@@ -1,140 +1,172 @@
 <% content_for :title, "New person" %>
-<h1>New person</h1>
+<h1 xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">New person</h1>
 
 <% content_for :javascript do %>
 
     <%= javascript_tag do %>
         $(function() {
-          $("#user_expires_at").datepicker({
-            showButtonPanel: true,
-            dateFormat: 'yy-mm-dd'
-          });
+        $("#user_expires_at").datepicker({
+        showButtonPanel: true,
+        dateFormat: 'yy-mm-dd'
+        });
 
-          // Do auto checks in case there is pre-populated data
-          update_twiki_and_email();
-          check_email();
-          check_webiso_account();
-          update_graduation_year();
+        // Do auto checks in case there is pre-populated data
+        update_twiki_and_email();
+        check_email();
+        check_webiso_account();
+        update_graduation_year();
         });
     <% end %>
 
     <script type="text/javascript">
         // Removes all hyphens "-" from the specified string and returns the new string.
         function remove_hyphens(string) {
-          return string.replace(/-/g, "");
+            return string.replace(/-/g, "");
         }
 
         // Capitalizes the first letter of the specified string and returns the new one. Also removes all spaces from the string.
         function capitalize(string) {
-          return string.charAt(0).toUpperCase() + string.substring(1).replace(/ /g, "");
+            return string.charAt(0).toUpperCase() + string.substring(1).replace(/ /g, "");
         }
 
         // Replaces spaces and "-" with "." to make into valid email accounts.
         function prepare_for_google(string) {
-          return string.toLowerCase().replace(/ /g, ".").replace(/-/g, ".");
+            return string.toLowerCase().replace(/ /g, ".").replace(/-/g, ".");
         }
 
         // Checks whether str ends with suffix.
         function ends_with(str, suffix) {
-          return str.indexOf(suffix, str.length - suffix.length) !== -1;
+            return str.indexOf(suffix, str.length - suffix.length) !== -1;
         }
 
         // Updates the TWiki name and email account from the first and last name fields of the form.
         function update_twiki_and_email() {
-          var first_name = document.forms["new_user"].user_first_name.value;
-          var last_name = document.forms["new_user"].user_last_name.value;
+            var first_name = document.forms["new_user"].user_first_name.value;
+            var last_name = document.forms["new_user"].user_last_name.value;
 
-          // Do nothing in an empty update
-          if (first_name == "" && last_name == "") {
-            return;
-          }
+            // Do nothing in an empty update
+            if (first_name == "" && last_name == "") {
+                return;
+            }
 
-          // TWiki - user names MJLee must be renamed to MjLee
-          var twiki_name = capitalize(remove_hyphens(first_name)) + capitalize(remove_hyphens(last_name));
+            // TWiki - user names MJLee must be renamed to MjLee
+            var twiki_name = capitalize(remove_hyphens(first_name)) + capitalize(remove_hyphens(last_name));
 
-          // Seok-Jeong Lee => seok.jeong.lee@sv.cmu.edu
-          var email = prepare_for_google(first_name) + "." + prepare_for_google(last_name) + "@<%=@domain%>";
+            // Seok-Jeong Lee => seok.jeong.lee@sv.cmu.edu
+            var email = prepare_for_google(first_name) + "." + prepare_for_google(last_name) + "@<%=@domain%>";
 
-          // Update and validate email
-          document.forms["new_user"].user_twiki_name.value = twiki_name;
-          document.forms["new_user"].user_email.value = email;
-          check_email();
+            // Update and validate email
+            document.forms["new_user"].user_twiki_name.value = twiki_name;
+            document.forms["new_user"].user_email.value = email;
+            check_email();
         }
 
         // Adds a div with an AJAX loader and the specified text under the specified node.
         function add_loader(node, text) {
-          node.empty();
-          node.append($('<div/>')
-              .append($('<div/>').css('float', 'left').append($('<%= image_tag("/images/loader.gif") %>')))
-              .append($('<div/>').css('float', 'left').text(text))
-              .append($('<br/>')));
+            node.empty();
+            node.append($('<div/>')
+                    .append($('<div/>').css('float', 'left').append($('<%= image_tag("/images/loader.gif") %>')))
+                    .append($('<div/>').css('float', 'left').text(text))
+                    .append($('<br/>')));
         }
 
         // Clears the specified node and adds an account error for the specified email if data communicates that the email already exists.
         function clear_or_display_account_error(node, email, data) {
-          node.empty();
+            node.empty();
 
-          // Display a warning if the account does exist
-          if (data && data.exists) {
-            node.append($('<div/>').css('color', 'red').text('The account "' + email + '" is already in use.'));
-          }
+            // Display a warning if the account does exist
+            if (data && data.exists) {
+                node.append($('<div/>').css('color', 'red').text('The account "' + email + '" is already in use.'));
+            }
         }
 
         // Checks whether the specified email address is already in use.
         function check_email() {
-          var email = document.forms["new_user"].user_email.value;
+            var email = document.forms["new_user"].user_email.value;
 
-          // Do nothing in an empty check
-          if (email == "") {
-            return;
-          }
+            // Do nothing in an empty check
+            if (email == "") {
+                return;
+            }
 
-          var node = $('#email_warning');
-          $.getJSON('<%=people_path%>/ajax_check_if_email_exists.json?q=' + email, function(data) {
-            clear_or_display_account_error(node, email, data);
-          });
-          add_loader(node, 'Checking email...');
+            var node = $('#email_warning');
+            $.getJSON('<%=people_path%>/ajax_check_if_email_exists.json?q=' + email, function(data) {
+                clear_or_display_account_error(node, email, data);
+            });
+            add_loader(node, 'Checking email...');
         }
 
         // Checks whether the specified webiso accoutn is already in use
         function check_webiso_account() {
-          var email = document.forms["new_user"].user_webiso_account.value
+            var email = document.forms["new_user"].user_webiso_account.value
 
-          // Do nothing in an empty check
-          if (email == "") {
-            return;
-          }
+            // Do nothing in an empty check
+            if (email == "") {
+                return;
+            }
 
-          // Adds an "@andrew.cmu.edu" to the webiso_account field if it doesn't already exist.
-          if (email != "" && !ends_with(email, "@andrew.cmu.edu")) {
-            email += "@andrew.cmu.edu";
-            document.forms["new_user"].user_webiso_account.value = email;
-          }
+            // Adds an "@andrew.cmu.edu" to the webiso_account field if it doesn't already exist.
+            if (email != "" && !ends_with(email, "@andrew.cmu.edu")) {
+                email += "@andrew.cmu.edu";
+                document.forms["new_user"].user_webiso_account.value = email;
+            }
 
-          // Async check for duplicate webiso accounts
-          var node = $('#webiso_account_warning');
-          $.getJSON('<%=people_path%>/ajax_check_if_webiso_account_exists.json?q=' + email, function(data) {
-            clear_or_display_account_error(node, email, data);
-          });
-          add_loader(node, 'Checking account...');
+            // Async check for duplicate webiso accounts
+            var node = $('#webiso_account_warning');
+            $.getJSON('<%=people_path%>/ajax_check_if_webiso_account_exists.json?q=' + email, function(data) {
+                clear_or_display_account_error(node, email, data);
+            });
+            add_loader(node, 'Checking account...');
         }
-       
-        // Updates the graduation year of a student 
+
+        // Update the graduation year of a student
         function update_graduation_year() {
-          now = new Date;
-          offset = 1;
-          if (document.forms["new_user"].user_is_part_time.checked == true) {
-            offset = 2
-          }
-          if (document.forms["new_user"].user_is_student.checked == true) {
-            document.forms["new_user"].user_graduation_year.value = (now.getFullYear() + offset);
-          } else {
-            document.forms["new_user"].user_graduation_year.value = "";
-          }
+            now = new Date;
+            offset = 1;
+            if ($("#user_is_part_time").is(':checked')) {
+                offset = 2
+            }
+            if ($("#user_is_student").is(':checked')) {
+                $("#graduation_year option").filter(function() {
+                    return $(this).text() == now.getFullYear() + offset;
+                }).prop('selected', true);
 
+            } else {
+                $("#graduation_year option").filter(function() {
+                    return $(this).text() == now.getFullYear()+1;
+                }).prop('selected', true);
+            }
         }
 
 
+        // Toggle student user attributes
+        function toggle_student_user_attributes(){
+            if($("#user_is_student").is(":checked")){
+                $("#student_user_attributes").fadeIn();
+            } else{
+                $("#student_user_attributes").fadeOut();
+            }
+        }
+
+        // Toggle student masters and phd programs
+        function toggle_masters_phd_program(){
+            if($("#graduate_program").val()=="MS"){
+                $("#masters_courses").fadeIn();
+                $("#phd_courses").hide();
+            }else if($("#graduate_program").val()=="PhD"){
+                $("#masters_courses").hide();
+                $("#phd_courses").fadeIn();
+            }
+        }
+
+        // Toggle student masters courses
+        function toggle_SE_tracks(){
+            if($("#masters_course").val()=="SE"){
+                $("#SE_tracks").fadeIn();
+            }else{
+                $("#SE_tracks").fadeOut();
+            }
+        }
     </script>
 
 <% end %>
@@ -151,92 +183,133 @@
           </ul>
         </div>
     <% end %>
+    <%= field_set_tag nil, :class=>'cmu_table', do %>
+        <p>
+          <%= f.label :first_name, "Preferred first name" %><br/>
+          <%= f.text_field :first_name, :onblur => "update_twiki_and_email()" %>
+        </p>
+        <p>
+          <%= f.label :legal_first_name %><br/>
+          <%= f.text_field :legal_first_name %><br/>
+          <span class="help_text">(Ok to leave blank)</span>
+        </p>
+        <p>
+          <%= f.label :last_name %><br/>
+          <%= f.text_field :last_name, :onblur => "update_twiki_and_email()" %>
+        </p>
 
-    <p>
-      <%= f.label :first_name, "Preferred first name" %><br/>
-      <%= f.text_field :first_name, :onblur => "update_twiki_and_email()" %>
-    </p>
-    <p>
-      <%= f.label :legal_first_name %><br/>
-      <%= f.text_field :legal_first_name %><br/>
-      <span class="help_text">(Ok to leave blank)</span>
-    </p>
-    <p>
-      <%= f.label :last_name %><br/>
-      <%= f.text_field :last_name, :onblur => "update_twiki_and_email()" %>
-    </p>
-
-    <!--
-    <% if Rails.env.development? %>
+        <!--
+        <% if Rails.env.development? %>
   <p>
   <%# f.label :password, f.object.new_record? ? nil : "Change password" %><br />
   <%# f.password_field :password %><br />
     <span class="help_text">(This field only appears in development for local login testing without a network)</span>
   </p>
   <% end %>
-    -->
+        -->
 
-    <p>
-      <%= f.label :twiki_name %><br/>
-      <%= f.text_field :twiki_name %>
-      <%= check_box_tag("create_twiki_account", 1, true) %> Create twiki account?
-    </p>
-    <p>
-      <%= f.label :email %><br/>
-      <%= f.text_field :email, :onblur => "check_email()" %>
-      <%= check_box_tag("create_google_email", 1, true) %> Create google email account?
-      <%= check_box_tag("create_active_directory_account", 1, false) %> Create active directory account?
-      <div id="email_warning"></div>
-    </p>
-    <p>
-      <%= f.label :webiso_account, "Andrew account" %><br/>
-      <%= f.text_field :webiso_account, :onblur => "check_webiso_account()", :placeholder => "@andrew.cmu.edu" %>
-      <div id="webiso_account_warning"></div>
-    </p>
-    <p>
-      <%= f.label :personal_email %><br/>
-      <%= f.text_field :personal_email %><br/>
-      <span class="help_text">(Necessary for google email account creation)</span>
-    </p>
+        <p>
+          <%= f.label :twiki_name %><br/>
+          <%= f.text_field :twiki_name %>
+          <%= check_box_tag("create_twiki_account", 1, false) %> Create twiki account?
+        </p>
+        <p>
+          <%= f.label :email %><br/>
+          <%= f.text_field :email, :onblur => "check_email()" %>
+          <!-- We will be creating google app accounts through Active Directory
+      <%#= check_box_tag("create_google_email", 1, true) %> Create google email account? -->
+          <%= check_box_tag("create_active_directory_account", 1, false) %> Create active directory account?
+        <div id="email_warning"></div>
+        </p>
+        <p>
+          <%= f.label :webiso_account, "Andrew account" %><br/>
+          <%= f.text_field :webiso_account, :onblur => "check_webiso_account()", :placeholder => "@andrew.cmu.edu" %>
+        <div id="webiso_account_warning"></div>
+        </p>
+        <p>
+          <%= f.label :personal_email %><br/>
+          <%= f.text_field :personal_email %>
+          <span class="help_text">(Necessary for google email account creation)</span>
+        </p>
+    <% end %>
+
     <h2>System Roles</h2>
-    <p>
-      <%= f.label :is_staff, "Is staff or faculty?" %><br/>
-      <%= f.check_box :is_staff %>
-    </p>
-    <p>
-      <%= f.label :is_student, "Is a student?" %><br/>
-      <%= f.check_box :is_student, :onchange => "update_graduation_year()" %>
-    </p>
-    <p>
-      <%= f.label :is_active, "Is active? - a current user?" %><br/>
-      <%= f.check_box :is_active %>
-    </p>
-    <h2>Just for students</h2>
-    <p>
-      <%= f.label :is_part_time, "Is part time student?" %>
-      <%= f.check_box :is_part_time, :onchange => "update_graduation_year()" %>
-    </p>
-    <p>
-      <%= f.label :graduation_year %><br/>
-      <%= f.text_field :graduation_year %>
-    </p>
-    <p>
-      Graduate program<br/>
-      <%= f.text_field :masters_program %><br/>
-      <span class="help_text">SE SM INI PhD</span>
-    </p>
-    <p>
-      Graduate track <br/>
-      <%= f.text_field :masters_track %><br/>
-      <span class="help_text">Tech DM IS MOB SM</span>
-    </p>
+    <%= field_set_tag nil, :class=>'cmu_table', do %>
+        <p>
+          <%= f.check_box :is_staff %>
+          <%= f.label :is_staff, "Is staff or faculty?" %><br/>
+        </p>
+        <p>
+          <%= f.check_box :is_student, :onchange => "toggle_student_user_attributes()" %>
+          <%= f.label :is_student, "Is a student?" %><br/>
+        </p>
+        <p>
+          <%= f.check_box :is_active %>
+          <%= f.label :is_active, "Is active? - a current user?" %><br/>
+        </p>
+    <% end %>
+
+
+    <div id="student_user_attributes" hidden>
+      <h2>Student Options</h2>
+      <%= field_set_tag nil, :class=>'cmu_table', do %>
+          <p>
+            <%= f.check_box :is_part_time, :onchange => "update_graduation_year()" %>
+            <%= f.label :is_part_time, "Is part time student?" %> <br/> <br/>
+          </p>
+          <p>
+            <%= select_tag :graduation_year, options_for_select((Time.now.year..Time.now.year+5).to_a), :selected=>Time.now.year+1, :style => "width:70px" %>  Graduation year
+          </p>
+          <p>
+            <%= select_tag :graduate_program, options_for_select(["MS","PhD"]), :style => "width:70px", :onchange=>"toggle_masters_phd_program()" %> Graduate program
+          </p>
+
+          <div id="masters_courses">
+            <p>
+              <%= select_tag :masters_course, options_for_select(["ECE","INI", "SE", "SM"]), :style => "width:70px", :onchange=>"toggle_SE_tracks()" %> Masters course
+            </p>
+          </div>
+
+
+          <div id="SE_tracks" hidden>
+            <p>
+              <%= select_tag :se_track, options_for_select(["Tech","DM"]), :style => "width:70px" %> SE course track
+            </p>
+          </div>
+
+          <div id="phd_courses" hidden>
+            <p>
+              <%= select_tag :phd_track, options_for_select(["ECE"]), :style => "width:70px" %> Graduate track
+            </p>
+          </div>
+
+      <% end %>
+    </div>
+
     <h2>Account Termination</h2>
-    <p>
-      <%= f.label "Expires at" %>
-      <%= f.text_field :expires_at, :size => 10 %><br/>
-      <% help_text = AcademicCalendar.next_semester + " semester starts on " + AcademicCalendar.date_for_semester_start(AcademicCalendar.next_semester, AcademicCalendar.next_semester_year).to_s %>
-      <span class="help_text">(<%= help_text %>)</span>
-    </p>
+    <%= field_set_tag nil, :class=>'cmu_table', do %>
+        <p>
+          <%= f.label "Expires at" %>
+          <%= f.text_field :expires_at, :size => 10 %>
+          <% help_text = AcademicCalendar.next_semester + " semester starts on " + AcademicCalendar.date_for_semester_start(AcademicCalendar.next_semester, AcademicCalendar.next_semester_year).to_s %>
+          <span class="help_text">(<%= help_text %>)</span>
+        </p>
+    <% end %>
+
+    <!--  This section specifies the account creation process type -->
+    <h2>Account Creation Process Type</h2>
+    <%= field_set_tag nil, :class=>'cmu_table', do %>
+        <p>
+          <%= radio_button_tag(:account_creation_process_type, "staged", :true) %>
+          Staged <span class="help_text">(Sends a link to the user's email, and the user completes the account creation process)</span>
+        </p>
+        <p>
+          <%= radio_button_tag(:account_creation_process_type, "express") %>
+          Express <span class="help_text">(Allows you to complete the entire account creation process)</span>
+        </p>
+    <% end %>
+    <br/>
+
 
 
     <%= f.submit "Create" %>
