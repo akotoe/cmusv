@@ -1,13 +1,14 @@
 <% content_for :title, "New person" %>
 <h1 xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">New person</h1>
 
+
 <% content_for :javascript do %>
 
     <%= javascript_tag do %>
         $(function() {
-        $("#user_expires_at").datepicker({
-        showButtonPanel: true,
-        dateFormat: 'yy-mm-dd'
+            $("#user_expires_at").datepicker({
+            showButtonPanel: true,
+            dateFormat: 'yy-mm-dd'
         });
 
         // Do auto checks in case there is pre-populated data
@@ -16,7 +17,16 @@
         check_webiso_account();
         update_graduation_year();
         });
+
+        // Toggle student and staff organization units
+        $(function(){
+            $("input[name=is_staff_or_student]").change(function(){
+                toggle_student_staff_organization_units()
+            });
+        });
     <% end %>
+
+
 
     <script type="text/javascript">
         // Removes all hyphens "-" from the specified string and returns the new string.
@@ -138,13 +148,15 @@
             }
         }
 
+        // Toggle student and staff organization units
+        function toggle_student_staff_organization_units(){
+            if($('input[name="is_staff_or_student"]:checked').val()=="staff"){
+                $("#student_organization_units").hide()
+                $("#staff_organization_units").fadeIn();
 
-        // Toggle student user attributes
-        function toggle_student_user_attributes(){
-            if($("#user_is_student").is(":checked")){
-                $("#student_user_attributes").fadeIn();
             } else{
-                $("#student_user_attributes").fadeOut();
+                $("#staff_organization_units").hide();
+                $("#student_organization_units").fadeIn()
             }
         }
 
@@ -167,6 +179,7 @@
                 $("#SE_tracks").fadeOut();
             }
         }
+
     </script>
 
 <% end %>
@@ -235,13 +248,10 @@
     <h2>System Roles</h2>
     <%= field_set_tag nil, :class=>'cmu_table', do %>
         <p>
-          <%= f.check_box :is_staff %>
-          <%= f.label :is_staff, "Is staff or faculty?" %><br/>
+          <%= radio_button_tag "is_staff_or_student", "student", false %> Is student? <br>
+          <%= radio_button_tag "is_staff_or_student", "staff", false %> Is staff?
         </p>
-        <p>
-          <%= f.check_box :is_student, :onchange => "toggle_student_user_attributes()" %>
-          <%= f.label :is_student, "Is a student?" %><br/>
-        </p>
+
         <p>
           <%= f.check_box :is_active %>
           <%= f.label :is_active, "Is active? - a current user?" %><br/>
@@ -249,39 +259,28 @@
     <% end %>
 
 
-    <div id="student_user_attributes" hidden>
-      <h2>Student Options</h2>
+    <!--  This section displays the organization unit structure-->
+    <div id="student_organization_units" hidden>
+      <h2>Student Organization Units</h2>
       <%= field_set_tag nil, :class=>'cmu_table', do %>
-          <p>
-            <%= f.check_box :is_part_time, :onchange => "update_graduation_year()" %>
-            <%= f.label :is_part_time, "Is part time student?" %> <br/> <br/>
-          </p>
-          <p>
-            <%= select_tag :graduation_year, options_for_select((Time.now.year..Time.now.year+5).to_a), :selected=>Time.now.year+1, :style => "width:70px" %>  Graduation year
-          </p>
-          <p>
-            <%= select_tag :graduate_program, options_for_select(["MS","PhD"]), :style => "width:70px", :onchange=>"toggle_masters_phd_program()" %> Graduate program
-          </p>
+      <% if !@organization_units.nil? %>
+             <% @organization_units.each do |ou|  %>
+               <%= radio_button_tag "organization_unit", ou.name %>
+               <%= label_tag ou.name %>  <br>
+            <% end %>
+      <% end %>
+     <% end %>
+    </div>
 
-          <div id="masters_courses">
-            <p>
-              <%= select_tag :masters_course, options_for_select(["ECE","INI", "SE", "SM"]), :style => "width:70px", :onchange=>"toggle_SE_tracks()" %> Masters course
-            </p>
-          </div>
-
-
-          <div id="SE_tracks" hidden>
-            <p>
-              <%= select_tag :se_track, options_for_select(["Tech","DM"]), :style => "width:70px" %> SE course track
-            </p>
-          </div>
-
-          <div id="phd_courses" hidden>
-            <p>
-              <%= select_tag :phd_track, options_for_select(["ECE"]), :style => "width:70px" %> Graduate track
-            </p>
-          </div>
-
+    <div id="staff_organization_units" hidden>
+      <h2>Staff Organization Units</h2>
+      <%= field_set_tag nil, :class=>'cmu_table', do %>
+          <% if !@organization_units.nil? %>
+              <% @organization_units.each do |ou|  %>
+                  <%= radio_button_tag "organization_unit", ou.name %>
+                  <%= label_tag ou.name %>  <br>
+              <% end %>
+          <% end %>
       <% end %>
     </div>
 
