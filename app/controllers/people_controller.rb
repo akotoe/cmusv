@@ -191,9 +191,7 @@ class PeopleController < ApplicationController
     @person.last_name = params[:last_name]
     @person.masters_program = params[:program]
     @person.expires_at = params[:expires_at]
-
-    @organization_units = AdOrganizationUnit.all
-
+    @org_units = AdOrganizationUnit.all.map { |ou| [ou.name, ou.id] }
 
         if Rails.env.development?
       @domain = GOOGLE_DOMAIN

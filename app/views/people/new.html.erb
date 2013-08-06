@@ -1,14 +1,15 @@
-<% content_for :title, "New person" %>
-<h1 xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html">New person</h1>
+<h1 xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html" xmlns="http://www.w3.org/1999/html"
+    xmlns="http://www.w3.org/1999/html">New person</h1>
 
+<% content_for :title, "New person" %>
 
 <% content_for :javascript do %>
 
     <%= javascript_tag do %>
         $(function() {
-            $("#user_expires_at").datepicker({
-            showButtonPanel: true,
-            dateFormat: 'yy-mm-dd'
+        $("#user_expires_at").datepicker({
+        showButtonPanel: true,
+        dateFormat: 'yy-mm-dd'
         });
 
         // Do auto checks in case there is pre-populated data
@@ -16,19 +17,14 @@
         check_email();
         check_webiso_account();
         update_graduation_year();
+        toggle_staff_student_organization_units();
+
         });
 
-        // Toggle student and staff organization units
-        $(function(){
-            $("input[name=is_staff_or_student]").change(function(){
-                toggle_student_staff_organization_units()
-            });
-        });
     <% end %>
 
-
-
     <script type="text/javascript">
+
         // Removes all hyphens "-" from the specified string and returns the new string.
         function remove_hyphens(string) {
             return string.replace(/-/g, "");
@@ -149,35 +145,37 @@
         }
 
         // Toggle student and staff organization units
-        function toggle_student_staff_organization_units(){
-            if($('input[name="is_staff_or_student"]:checked').val()=="staff"){
-                $("#student_organization_units").hide()
-                $("#staff_organization_units").fadeIn();
+        function toggle_staff_student_organization_units(){
 
-            } else{
+            //  Show student organization units and hide staff organization units
+            if($("#user_is_student").is(':checked') && !$("#user_is_staff").is(':checked') ){
+                $("#students_organization_units").fadeIn();
                 $("#staff_organization_units").hide();
-                $("#student_organization_units").fadeIn()
+                $("#all_organization_units").hide();
+                return
             }
-        }
 
-        // Toggle student masters and phd programs
-        function toggle_masters_phd_program(){
-            if($("#graduate_program").val()=="MS"){
-                $("#masters_courses").fadeIn();
-                $("#phd_courses").hide();
-            }else if($("#graduate_program").val()=="PhD"){
-                $("#masters_courses").hide();
-                $("#phd_courses").fadeIn();
+            //  Show staff organization units and hide student organization units
+            if($("#user_is_staff").is(':checked') && !$("#user_is_student").is(':checked')){
+                $("#students_organization_units").fadeIn();
+                $("#staff_organization_units").hide();
+                $("#all_organization_units").hide();
+                return
             }
-        }
 
-        // Toggle student masters courses
-        function toggle_SE_tracks(){
-            if($("#masters_course").val()=="SE"){
-                $("#SE_tracks").fadeIn();
-            }else{
-                $("#SE_tracks").fadeOut();
+            // Display all organization units
+            if($("#user_is_staff").is(':checked') && $("#user_is_student").is(':checked')){
+                $("#students_organization_units").hide();
+                $("#staff_organization_units").hide();
+                $("#all_organization_units").fadeIn();
+                return
             }
+
+            // Hide all organization units by default
+            $("#students_organization_units").hide();
+            $("#staff_organization_units").hide();
+            $("#all_organization_units").hide();
+
         }
 
     </script>
@@ -248,42 +246,37 @@
     <h2>System Roles</h2>
     <%= field_set_tag nil, :class=>'cmu_table', do %>
         <p>
-          <%= radio_button_tag "is_staff_or_student", "student", false %> Is student? <br>
-          <%= radio_button_tag "is_staff_or_student", "staff", false %> Is staff?
-        </p>
+          <%= f.check_box :is_student, :onclick=>"toggle_staff_student_organization_units()" %>
+          <%= f.label :is_student, "Is student?"%> <br/>
 
-        <p>
+          <%= f.check_box :is_staff, :onclick=>"toggle_staff_student_organization_units()" %>
+          <%= f.label :is_staff, "Is staff?"%> <br/>
+
           <%= f.check_box :is_active %>
           <%= f.label :is_active, "Is active? - a current user?" %><br/>
         </p>
     <% end %>
 
-
-    <!--  This section displays the organization unit structure-->
-    <div id="student_organization_units" hidden>
-      <h2>Student Organization Units</h2>
+    <!--  This section displays the organization unit structure for selection-->
+      <h2>Primary Organization Unit</h2>
       <%= field_set_tag nil, :class=>'cmu_table', do %>
-      <% if !@organization_units.nil? %>
-             <% @organization_units.each do |ou|  %>
-               <%= radio_button_tag "organization_unit", ou.name %>
-               <%= label_tag ou.name %>  <br>
-            <% end %>
-      <% end %>
-     <% end %>
-    </div>
+        <!-- All organization units -->
+        <div id="all_organization_units">
+          <%= select_tag "org_unit", options_for_select(@org_units.select {|ou| ou[0].downcase}.sort)  %>
+        </div>
 
-    <div id="staff_organization_units" hidden>
-      <h2>Staff Organization Units</h2>
-      <%= field_set_tag nil, :class=>'cmu_table', do %>
-          <% if !@organization_units.nil? %>
-              <% @organization_units.each do |ou|  %>
-                  <%= radio_button_tag "organization_unit", ou.name %>
-                  <%= label_tag ou.name %>  <br>
-              <% end %>
-          <% end %>
-      <% end %>
-    </div>
+        <!-- Students organization units -->
+        <div id="students_organization_units" hidden>
+          <%= select_tag "org_unit", options_for_select(@org_units.select {|ou| ou[0].downcase.starts_with?("student")}.sort)  %>
+        </div>
 
+        <!-- Staff organization units -->
+        <div id="staff_organization_units" hidden>
+          <%= select_tag "org_unit", options_for_select(@org_units.select {|ou| ou[0].downcase.starts_with?("staff")}.sort)  %>
+        </div>
+      <% end %>
+
+    <!--  Account termination -->
     <h2>Account Termination</h2>
     <%= field_set_tag nil, :class=>'cmu_table', do %>
         <p>
@@ -307,8 +300,6 @@
         </p>
     <% end %>
     <br/>
-
-
 
     <%= f.submit "Create" %>
     </p>
