@@ -11,7 +11,6 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-
 ActiveRecord::Schema.define(:version => 20130801073809) do
   create_table "assignments", :force => true do |t|
     t.string   "name"
@@ -217,6 +216,43 @@ ActiveRecord::Schema.define(:version => 20130801073809) do
   end
 
   add_index "grading_rules", ["course_id"], :name => "index_grading_rules_on_course_id"
+
+  create_table "job_employees", :force => true do |t|
+    t.integer  "job_id"
+    t.integer  "user_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "job_employees", ["job_id"], :name => "index_job_employees_on_job_id"
+  add_index "job_employees", ["user_id"], :name => "index_job_employees_on_user_id"
+
+  create_table "job_supervisors", :force => true do |t|
+    t.integer  "job_id"
+    t.integer  "user_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "job_supervisors", ["job_id"], :name => "index_job_supervisors_on_job_id"
+  add_index "job_supervisors", ["user_id"], :name => "index_job_supervisors_on_user_id"
+
+  create_table "jobs", :force => true do |t|
+    t.string   "title"
+    t.text     "description"
+    t.string   "skills_must_haves"
+    t.string   "skills_nice_haves"
+    t.string   "duration"
+    t.string   "sponsored_project_id"
+    t.text     "funding_description"
+    t.boolean  "is_accepting",         :default => true
+    t.boolean  "is_closed",            :default => false
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.text     "log"
+  end
+
+  add_index "jobs", ["sponsored_project_id"], :name => "index_jobs_on_sponsored_project_id"
 
   create_table "job_employees", :force => true do |t|
     t.integer  "job_id"

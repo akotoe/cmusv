@@ -10,7 +10,7 @@ class PeopleController < ApplicationController
 
   ; private(:controller)
 
-  before_filter :authenticate_user!, :except => [:show_by_twiki]
+  before_filter :authenticate_user!, :except => [:show_by_twiki, :init_account, :update]
 
 # Floating box source: http://roshanbh.com.np/2008/07/top-floating-message-box-using-jquery.html
 
@@ -174,6 +174,21 @@ class PeopleController < ApplicationController
     end
   end
 
+  # GET /people/init/random/edit
+  def init_account
+    @person = User.find_by_auth_token!(params[:auth_token])
+    @strength_themes = StrengthTheme.all
+
+    # Block link if active directory is already created
+    if @person.is_directory_enabled?
+      redirect_to root_url, :flash => { :error => "Account creation link has expired. Please contact Technical Operations" } and return
+    end
+
+    # Rescue if link is invalid
+    rescue ActiveRecord::RecordNotFound
+      redirect_to root_url, :flash => { :error => "Account creation link has expired. Please contact Technical Operations" } and return
+  end
+
   #http://localhost:3000/people/new?first_name=Todd&last_name=Sedano&webiso_account=at33@andrew.cmu.edu&is_student=true&program=ECE&expires_at=2013-01-01
 
   # GET /people/new
@@ -210,7 +225,6 @@ class PeopleController < ApplicationController
   # GET /people/1/edit
   def edit
     @person = User.find_by_param(params[:id])
-
     unless @person.id == current_user.id or current_user.is_admin?
       flash[:error] = "You're not allowed to edit this user's profile."
       redirect_to user_path(@person)
@@ -234,17 +248,18 @@ class PeopleController < ApplicationController
     @person.photo_selection = "first"
 
     respond_to do |format|
-
       if @person.save
-        create_google_email = params[:create_google_email]
-        create_twiki_account = params[:create_twiki_account]
-        create_active_directory_account = params[:create_active_directory_account]
 
-        Delayed::Job.enqueue(PersonJob.new(@person.id, create_google_email, create_twiki_account, create_active_directory_account)) unless create_google_email.nil? && create_twiki_account.nil? && create_active_directory_account.nil?
-
-        flash[:notice] = 'Person was successfully created.'
-        format.html { redirect_to(@person) }
-        format.xml { render :xml => @person, :status => :created, :location => @person }
+          # Send welcome email link if account creation type is staged
+          # Else redirect to profile edit page and complete rest of creation process
+          if params[:account_creation_type]=="staged"
+            PersonMailer.welcome_email(@person).deliver
+            flash[:notice] = 'Account has been staged for creation. To complete the account creation process, an email has been sent to '+@person.personal_email+"."
+            format.html { redirect_to(@person)  }
+          else
+            format.html { redirect_to edit_person_path(@person) }
+          end
+            format.xml { render :xml => @person, :status => :created, :location => @person }
       else
         format.html { render :action => "new" }
         format.xml { render :xml => @person.errors, :status => :unprocessable_entity }
@@ -283,9 +298,9 @@ class PeopleController < ApplicationController
     @person = User.find_by_param(params[:id])
     # authorize! :update, @person
 
-    Rails.logger.info("People#update #{request.env["REQUEST_PATH"]} #{current_user.human_name} #{params}")
+    #Rails.logger.info("People#update #{request.env["REQUEST_PATH"]} #{current_user.human_name} #{params}")
 
-    @person.updated_by_user_id = current_user.id
+    @person.updated_by_user_id = current_user.id if current_user
     @strength_themes = StrengthTheme.all
 
     respond_to do |format|
@@ -296,9 +311,20 @@ class PeopleController < ApplicationController
         unless @person.is_profile_valid
           flash[:error] = "Please update your (social handles or biography) and your contact information"
         end
-        flash[:notice] = 'Person was successfully updated.'
-        format.html { redirect_to(@person) }
-        format.xml { head :ok }
+
+        # Create active directory account if not yet created
+        @person.create_active_directory_account unless !params[:create_active_directory_account]=="true"
+
+        if @person.active_directory_account_created_at && @person.active_directory_account_created_at>2.minutes.ago
+          flash[:notice] = 'Profile was successfully updated. Go ahead and create a password'
+          format.html { redirect_to edit_password_reset_path(@person.password_reset_token) }
+          format.xml { head :ok }
+        else
+          flash[:notice] = 'Profile was successfully updated.'
+          format.html { redirect_to person_path(@person) }
+          format.xml { head :ok }
+        end
+
       else
         format.html { render :action => "edit" }
         format.xml { render :xml => @person.errors, :status => :unprocessable_entity }
@@ -671,5 +697,4 @@ class PeopleController < ApplicationController
         return ""
     end
   end
-
 end

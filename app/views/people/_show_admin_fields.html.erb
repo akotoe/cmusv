@@ -1,3 +1,26 @@
+<% content_for :javascript do %>
+    <script type="text/javascript">
+        // Toggle TWiki notification
+        function toggle_twiki_notification(){
+            if( $("#notify_twiki_user").is(':checked')){
+                $("#twiki_account_notification").fadeIn();
+            }else{
+                $("#twiki_account_notification").fadeOut();
+            }
+
+        }
+
+        // Toggle active directory notification
+        function toggle_active_directory_notification(){
+            if( $("#notify_active_directory_user").is(":checked")){
+                $("#active_directory_notification").fadeIn();
+            }else{
+                $("#active_directory_notification").fadeOut();
+            }
+        }
+    </script>
+<% end %>
+
 <div class="clearboth">
     <h2>Editable by Admin:</h2>
     <table class="cmu_table user_profile_content_admin_editable">
@@ -34,7 +57,23 @@
         </tr>
         <tr>
             <td><%= f.label :twiki_name, "TWiki name" %></td>
-            <td><%= f.text_field :twiki_name, :placeholder => "TWiki name" %></td>
+            <td>
+
+              <%= f.text_field :twiki_name, :placeholder => "TWiki name" %>
+              <%= check_box_tag 'create_twiki_account', 1, false, :disabled=>person.twiki_created %>
+              <%= f.label 'Create' %>
+              <%= check_box_tag 'disable_twiki_account', 1, false%>
+              <%= f.label 'Disable' %>
+              <%= check_box_tag("notify_twiki_user", 1, false, :onchange=>"toggle_twiki_notification()")%>
+              <%= f.label 'Notify' %><br/>
+              <p>
+              <div id='twiki_account_notification' hidden="true">
+                <%= text_area(:notification, :message, :cols => 43, :rows => 3, :placeholder=>'Type notification') %>
+              </div>
+              </p>
+
+
+            </td>
         </tr>
         <tr>
             <td><%= f.label "Display name" %></td>
@@ -75,6 +114,13 @@
             <td><%= f.label :is_adobe_connect_host, "Is adobe host" %></td>
             <td><%= f.check_box :is_adobe_connect_host, :disabled => 'disabled' %></td>
         </tr>
+        <tr>
+            <td>Active Directory Account></td>
+            <td>
+              <%= check_box_tag 'create_active_directory_account', 1, person.is_directory_enabled? %>
+              <%= check_box_tag 'suspend_active_directory_account', 1, false %>
+            </td>
+        </tr>
 
 
         <% else %>
@@ -106,9 +152,23 @@
             <td><%= f.label :is_ga_promised, "Promised a GA?" %></td>
             <td><%= f.check_box :is_ga_promised %></td>
         </tr>
-
+        <tr>
+          <td>Active Directory Account</td>
+            <td>
+              <%= check_box_tag 'create_active_directory_account', 1, person.is_directory_enabled?, :disabled=>person.is_directory_enabled? %>
+              <%= f.label 'Create' %>
+              <%= check_box_tag 'suspend_active_directory_account', 1, false%>
+              <%= f.label 'Disable' %>
+              <%= check_box_tag("notify_active_directory_user", 1, false, :onchange=>"toggle_active_directory_notification()")%>
+              <%= f.label 'Notify' %><br/>
+              <p>
+              <div id='active_directory_notification' hidden="true">
+                <%= text_area(:notification, :message, :cols => 43, :rows => 3, :placeholder=>'Type notification') %>
+              </div>
+              </p>
+            </td>
+        </tr>
         <% end %>
-
     </table>
 </div>
 

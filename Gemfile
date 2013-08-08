@@ -18,7 +18,10 @@ gem 'omniauth-google-apps', :git => 'git://github.com/sishen/omniauth-google-app
 gem 'devise'
 
 
+
 gem "ckeditor", "3.6.3"
+
+gem "net-ldap", "~> 0.3.1"
 
 
 gem 'bundler'
@@ -40,8 +43,6 @@ gem 'exception_notification', :require => 'exception_notifier'
 
 gem 'pg'
 
-gem 'net-ldap'
-
 gem "recaptcha", :require => "recaptcha/rails"
 
 gem 'cancan'
@@ -54,6 +55,7 @@ gem 'vpim'  # user for exporting contacts to vCard and iCalendar support
 gem 'seedbank'
 gem 'spreadsheet'
 
+gem "recaptcha", :require => "recaptcha/rails"
 
 group :production do
   gem 'thin'

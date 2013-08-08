@@ -610,7 +610,7 @@ background:url(../images/people_filtering_sprite.png)  0px 0;
 
 .user_profile_title, .user_profile_contact_details_content{
     float: left;
-    width: 70%;
+    width: 69%;
     margin: 0 0 5px 15px;
     padding: 0px 0 0 20px;
 }
@@ -722,7 +722,7 @@ background:url(../images/people_filtering_sprite.png)  0px 0;
 .user_profile_content_body table tr td:first-child,
 .user_profile_contact_details_content table tr td:first-child,
 .user_profile_content .clearboth table.cmu_table tr td:first-child {
-    width: 30%;
+    width: 31%;
     text-align: right;
     vertical-align: middle;
 }

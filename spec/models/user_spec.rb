@@ -307,6 +307,11 @@ describe User do
       end
     end
 
+  context "can create_active_directory_account" do
+    pending " returns true when active directory account is successfully created"
+
+  end
+
 
   context "registered_for_these_courses_during_current_semester" do
 

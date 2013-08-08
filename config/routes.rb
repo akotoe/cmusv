@@ -15,6 +15,8 @@ CMUEducation::Application.routes.draw do
   end
 
   resources :search, :only => [:index]
+  resources :password_resets
+
   #get    "/deliverables/get_assignments_for_student(.:format)" =>  "deliverables#get_assignments_for_student"
 
   resources :password_resets
@@ -167,6 +169,15 @@ CMUEducation::Application.routes.draw do
   match '/new_features' => 'welcome#new_features', :as => :new_features
   match '/config' => 'welcome#configuration', :as => :config
   match '/' => 'welcome#index', :as => :root
+
+  # password reset pages
+  match '/password_resets' => 'password_resets#new', :as => :reset
+
+  match '/people/init/:auth_token/edit' => 'people#init_account', :as => :my_teams
+
+
+
+
 
 end
 

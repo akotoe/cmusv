@@ -4,13 +4,50 @@ class PersonMailer < ActionMailer::Base
           :bcc => "rails.app@sv.cmu.edu",
           :subject => 'Welcome to Carnegie Mellon University Silicon Valley'
 
-  def welcome_email(person, password, options = {})
-    @person = person
-    @password = password
 
-    mail(:to => [@person.email, @person.webiso_account, @person.personal_email],
+  # Send general welcome information when a new account is initiated
+  # Send a link to new user for completing account creation process
+  def welcome_email(person, options = {})
+    @person = person
+
+    mail(:to => [@person.personal_email],
          :subject => options[:subject] || "Welcome to Carnegie Mellon University Silicon Valley (" + @person.email + ")",
          :date => Time.now)
+    #mail :to => person.personal_email, :subject => "Whiteboard Password Reset"
+  end
+
+  # Send general information about various accounts once the user completes account creation process
+  def general_account_information(person, options = {})
+    @person = person
+
+    mail(:to => [@person.personal_email],
+         :subject => options[:subject] || "Account information (" + @person.email + ")",
+         :date => Time.now)
+
+  end
+
+  # Send twiki account information
+  def twiki_created_notification(person, options={})
+    @person = person
+    mail(:to=>[@person.personal_email],
+          :subject=>options[:subject] || "Twiki account information ("+@person.email+")",
+          :date=>Time.now)
+  end
+
+  # Send Andrews account information
+  def andrew_account_created_notification(person, options={})
+    @person = person
+    mail(:to=>[@person.personal_email],
+         :subject=>options[:subject] || "Andrew account information ("+@person.email+")",
+         :date=>Time.now)
+  end
+
+  # Send active directory password change information
+  def active_directory_password_change_notification(person, options={})
+    @person = person
+    mail(:to=>[@person.personal_email],
+         :subject=>options[:subject] || "Password change notification ("+@person.email+")",
+         :date=>Time.now)
   end
 
 end

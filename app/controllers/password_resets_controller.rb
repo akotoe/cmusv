@@ -32,27 +32,36 @@ class PasswordResetsController < ApplicationController
     redirect_to new_password_reset_path, :flash => {:error => "Password reset link is invalid."}
   end
 
-  # Do actual password reset
+  # Performs actual password reset
   def update
     @user = User.find_by_password_reset_token!(params[:id])
     @active_directory_services = ActiveDirectory.new
     respond_to do |format|
-      if @user.password_reset_sent_at > 2.hours.ago
-        if params[:new_password]
-          if @active_directory_services.reset_password(@user, params[:new_password]) == "Success"
-            flash[:notice] = "Password has been reset!"
-            format.html { redirect_to root_url }
+      if @user.password_reset_sent_at>2.hours.ago
+        if params[:newPassword]
+          if Ldap.authenticate
+            message = @active_directory_services.reset_password(@user, params[:new_password])
+            if message == "Success"
+              if @user.active_directory_account_created_at>10.minutes.ago
+                flash[:notice] = "You have successfully created your account! You can log in with your new password."
+                PersonMailer.general_account_information(@user).deliver
+              else
+                flash[:notice] = "Your password was successfully changed! Login with your new password."
+                PersonMailer.active_directory_password_change_notification(@user).deliver
+              end
+              format.html {redirect_to root_url}
+            else
+              flash[:error]="Password does not meet required minimum complexity. Read instructions below."
+              redirect_to edit_password_reset_path and return
+            end
           else
-            flash[:error]="Password reset was unsuccessful. Read the instructions below or contact help@sv.cmu.edu"
-            redirect_to edit_password_reset_path and return
+            flash[:error] = "Cannot contact server."
+            format.html {redirect_to edit_password_reset_path}
           end
-        else
-          flash[:error]="Invalid new password parameter. Contact help@sv.cmu.edu"
-          redirect_to edit_password_reset_path and return
         end
       else
-        flash[:error] = "Password reset link has expired."
-        format.html { redirect_to new_password_reset_path }
+        flash[:error] = "Password reset link has expired #{@user.password_reset_sent_at}"+"#{2.hours.ago}"+"  #{@user.password_reset_sent_at < 2.hours.ago}"
+        format.html {redirect_to new_password_reset_path}
       end
     end
   end
