@@ -1,4 +1,22 @@
+
 <%= javascript_include_tag 'password_reset' %>
+<%= javascript_include_tag 'passwordStrengthMeter' %>
+
+<% content_for :javascript do %>
+
+    <script type="text/javascript">
+
+        // jQuery script to show password strength
+        $(function() {
+            $("#newPassword").keyup(
+                    function() {
+                        $('#result').html(passwordStrength($('#newPassword').val()))
+                    });
+        });
+
+    </script>
+<% end %>
+
 
 <%= form_for @user, { :url => password_reset_path(params[:id]) }  do |f| %>
     <p>
@@ -11,6 +29,7 @@
     <p>
       <label for="p" class="screen-reader-text">New password:</label><br/>
       <input type="password" id="newPassword" name="newPassword" value="">
+      <span style="color:green" id='result'></span>
     </p>
     <p>
       <label for="p" class="screen-reader-text">Confirm password:</label><br/>

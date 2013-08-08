@@ -379,7 +379,7 @@ class User < ActiveRecord::Base
         logger.debug(e)
         return e
       end
-      #self.directory_enabled_at = Time.now()
+      self.active_directory_account_created_at = Time.now()
       self.save
       return true
     end
@@ -494,7 +494,6 @@ class User < ActiveRecord::Base
     end
     return true
   end
-
 
 
 end

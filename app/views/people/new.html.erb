@@ -56,7 +56,7 @@
             var email = prepare_for_google(first_name) + "." + prepare_for_google(last_name) + "@<%=@domain%>";
 
             // Update and validate email
-            //document.forms["new_user"].user_twiki_name.value = twiki_name;
+            document.forms["new_user"].user_twiki_name.value = twiki_name;
             document.forms["new_user"].user_email.value = email;
             check_email();
         }
@@ -119,24 +119,41 @@
             add_loader(node, 'Checking account...');
         }
 
-        // Updates the graduation year of a student 
+        // Updates the graduation year of a student
         function update_graduation_year() {
             now = new Date;
             offset = 1;
-            if (document.forms["new_user"].user_is_part_time.checked == true) {
+            if ($("#is_part_time").is(':checked')) {
                 offset = 2
             }
-            if (document.forms["new_user"].user_is_student.checked == true) {
-                document.forms["new_user"].user_graduation_year.value = (now.getFullYear() + offset);
+            if ($("#user_is_student").is(':checked')) {
+                $("#graduation_year option").filter(function() {
+                    return $(this).text() == now.getFullYear() + offset;
+                }).prop('selected', true);
+
             } else {
-                document.forms["new_user"].user_graduation_year.value = "";
+                $("#graduation_year option").filter(function() {
+                    return $(this).text() == now.getFullYear()+1;
+                }).prop('selected', true);
             }
         }
 
-        // Toggles student parameters
-        function toggle_student_parameters(){
-            //update_graduation_year()
-            $("#student_parameters").slideToggle()
+        // Toggles between student and staff
+        function toggle_staff_and_student_parameters(){
+
+            if($('input[name=role]:radio:checked').val()=="is_staff"){
+                $("#student_parameters").fadeOut()
+                $("#user_is_staff").prop('checked', true)
+                $("#user_is_student").prop('checked', false)
+
+            }
+
+            if($('input[name=role]:radio:checked').val()=="is_student"){
+                $("#student_parameters").fadeIn()
+                $("#user_is_staff").prop('checked', false)
+                $("#user_is_student").prop('checked', true)
+
+            }
         }
 
         // Toggles graduation track
@@ -146,8 +163,6 @@
             }else {
                 $("#masters_track_parameters").fadeOut()
             }
-
-
         }
     </script>
 
@@ -182,12 +197,12 @@
         <p>
           <%= f.label :twiki_name %><br/>
           <%= f.text_field :twiki_name %>
-          <%= check_box_tag("create_twiki_account", 1, true) %> Create twiki account?
+          <%= check_box_tag("create_twiki_account", 1, false) %> Create twiki account?
         </p>
         <p>
           <%= f.label :email %><br/>
           <%= f.text_field :email, :onblur => "check_email()" %>
-          <%= check_box_tag("create_google_email", 1, true) %> Create google email account?
+          <!--<%#= check_box_tag("create_google_email", 1, false) %> Create google email account?-->
           <%= check_box_tag("create_active_directory_account", 1, false) %> Create active directory account?
         <div id="email_warning"></div>
         </p>
@@ -206,26 +221,30 @@
     <h2>System Roles</h2>
     <%= field_set_tag nil, :class=>'cmu_table', do %>
         <p>
-          <%= f.check_box :is_staff %>
-          <%= f.label :is_staff, "Is staff or faculty?" %>
+          <%= radio_button_tag("role", 'is_staff', false, :onchange => "toggle_staff_and_student_parameters()") %>
+          <%= label :is_staff, "Is staff or faculty?" %>
         </p>
         <p>
-          <%= check_box_tag("is_student", 1, true, :onchange => "toggle_student_parameters()") %>
-          <%= f.label :is_student, "Is a student?" %>
+          <%= radio_button_tag("role", 'is_student', false, :onchange => "toggle_staff_and_student_parameters()") %>
+          <%= label :is_student, "Is a student?" %>
         </p>
         <p>
           <%= f.check_box :is_active %>
           <%= f.label :is_active, "Is active? - a current user?" %>
+
+          <!-- hidden-->
+          <%= f.check_box :is_staff,  :style=>'visibility: hidden'%>
+          <%= f.check_box :is_student, :style=>'visibility: hidden'%>
         </p>
     <% end %>
-    <div id="student_parameters">
+    <div id="student_parameters" hidden>
         <h2>Student options</h2>
         <%= field_set_tag nil, :class=>'cmu_table', do %>
               <p>
-                <%= check_box_tag("is_part_time", 1, true, :onchange => "update_graduation_year()") %> Is part time student?
+                <%= check_box_tag("is_part_time", 1, false, :onchange => "update_graduation_year()") %> Is part time student?
               </p>
               <p>
-                <%= select_tag :graduation_year, options_for_select((2013..2030).to_a), :style => "width:70px" %> Graduation year
+                <%= select_tag :graduation_year, options_for_select((Time.now.year..Time.now.year+5).to_a), :selected=>Time.now.year+1, :style => "width:70px" %> Graduation year
               </p>
               <p>
                 <%= select_tag :graduation_program, options_for_select(["SM", "SE", "INI", "PhD"]), :style => "width:70px", :onchange=>"toggle_masters_track()" %> Graduate program

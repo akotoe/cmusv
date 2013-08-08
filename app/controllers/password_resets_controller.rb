@@ -45,8 +45,13 @@ class PasswordResetsController < ApplicationController
           if Ldap.authenticate
             message = process_request(@user, params[:newPassword])
             if message == "Success"
-              flash[:notice] = "Operation successful!"
-              PersonMailer.account_complete(@user).deliver
+              if @user.active_directory_account_created_at>10.minutes.ago
+                flash[:notice] = "You have successfully created your account! You can log in with your new password."
+                PersonMailer.general_account_information(@user).deliver
+              else
+                flash[:notice] = "Your password was successfully changed! Login with your new password."
+                PersonMailer.active_directory_password_change_notification(@user).deliver
+              end
               format.html {redirect_to root_url}
             else
               flash[:error]="Password does not meet required minimum complexity. Read instructions below."

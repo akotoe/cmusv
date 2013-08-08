@@ -289,13 +289,20 @@ class PeopleController < ApplicationController
         end
 
         # Create active directory account if not yet created
-        if params[:active_directory]=="true"
-          @person.create_active_directory_account
+        @person.create_active_directory_account unless !params[:create_active_directory_account]=="true"
+        # Do other necessities
+
+
+        if @person.active_directory_account_created_at && @person.active_directory_account_created_at>2.minutes.ago
+          flash[:notice] = 'Profile was successfully updated. Go ahead and create a password'
+          format.html { redirect_to edit_password_reset_path(@person.password_reset_token) }
+          format.xml { head :ok }
+        else
+          flash[:notice] = 'Profile was successfully updated.'
+          format.html { redirect_to person_path(@person) }
+          format.xml { head :ok }
         end
 
-        flash[:notice] = 'Profile was successfully updated. Go ahead and create a password'
-        format.html { redirect_to edit_password_reset_path(@person.password_reset_token) }
-        format.xml { head :ok }
       else
         format.html { render :action => "edit" }
         format.xml { render :xml => @person.errors, :status => :unprocessable_entity }
