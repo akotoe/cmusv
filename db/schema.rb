@@ -11,8 +11,8 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130801073809) do
 
+ActiveRecord::Schema.define(:version => 20130801073809) do
   create_table "assignments", :force => true do |t|
     t.string   "name"
     t.float    "maximum_score"
