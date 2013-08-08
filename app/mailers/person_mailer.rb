@@ -4,6 +4,9 @@ class PersonMailer < ActionMailer::Base
           #:bcc => 'todd.sedano@sv.cmu.edu',
           :subject => 'Welcome to Carnegie Mellon University Silicon Valley'
 
+
+  # Send general welcome information when a new account is initiated
+  # Send a link to new user for completing account creation process
   def welcome_email(person, options = {})
     @person = person
 
@@ -13,6 +16,7 @@ class PersonMailer < ActionMailer::Base
     #mail :to => person.personal_email, :subject => "Whiteboard Password Reset"
   end
 
+  # Send general information about various accounts once the user completes account creation process
   def general_account_information(person, options = {})
     @person = person
 
@@ -22,6 +26,7 @@ class PersonMailer < ActionMailer::Base
 
   end
 
+  # Send twiki account information
   def twiki_created_notification(person, options={})
     @person = person
     mail(:to=>[@person.personal_email],
@@ -29,6 +34,7 @@ class PersonMailer < ActionMailer::Base
           :date=>Time.now)
   end
 
+  # Send Andrews account information
   def andrew_account_created_notification(person, options={})
     @person = person
     mail(:to=>[@person.personal_email],
@@ -36,6 +42,7 @@ class PersonMailer < ActionMailer::Base
          :date=>Time.now)
   end
 
+  # Send active directory password change information
   def active_directory_password_change_notification(person, options={})
     @person = person
     mail(:to=>[@person.personal_email],
