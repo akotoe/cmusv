@@ -138,8 +138,6 @@
             }
         }
 
-        // Toggles between student and staff
-        function toggle_staff_and_student_parameters(){
         // Toggle student user attributes
          function toggle_student_user_attributes(){
              if($("#user_is_student").is(":checked")){
@@ -307,20 +305,6 @@
         <p>
           <%= radio_button_tag(:account_creation_process_type, "express") %>
           Express <span class="help_text">(Allows you to complete the entire account creation process)</span>
-        </p>
-    <% end %>
-    <br/>
-
-    <!-- Added this section for specifying the account creation process type -->
-    <h2>Account Creation Process Type</h2>
-    <%= field_set_tag nil, :class=>'cmu_table', do %>
-        <p>
-          Staged <br/>
-          <%= radio_button_tag(:account_creation_type, "staged", :true) %>
-        </p>
-        <p>
-          Express <br/>
-          <%= radio_button_tag(:account_creation_type, "express") %>
         </p>
     <% end %>
     <br/>
