@@ -8,7 +8,7 @@
     // Validate password reset form
     function validatePasswordResetForm(){
         if ( ($("#cmu_email").val()=="") || ($("#personal_email").val()=="")  ){
-            return warnBlankFields()
+            return warnBlankEmailFields()
         } else{
             return true
         }

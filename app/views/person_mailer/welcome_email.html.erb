@@ -4,8 +4,8 @@ We have initiated an account creation process for your Silicon Valley email. Thi
 <br/>
 <br/>
 
-To complete the process, follow this link:
-http://localhost:3000/people/init/<%= @person.auth_token %>/edit  and fill in your profile information. </b><br/>
+To complete the account creation process, follow this link:
+http://<%= @host%>/people/new_user/<%= @person.new_user_token %> and fill in your profile information. </b><br/>
 
 <br/>This link will expire in 48hours from <%= Time.now  %>
 

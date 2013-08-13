@@ -9,11 +9,12 @@ class PersonMailer < ActionMailer::Base
   # Send a link to new user for completing account creation process
   def welcome_email(person, options = {})
     @person = person
+    @host = ENV['HOST_NAME'] || "localhost:3000"
 
     mail(:to => [@person.personal_email],
          :subject => options[:subject] || "Welcome to Carnegie Mellon University Silicon Valley (" + @person.email + ")",
          :date => Time.now)
-    #mail :to => person.personal_email, :subject => "Whiteboard Password Reset"
+
   end
 
   # Send general information about various accounts once the user completes account creation process

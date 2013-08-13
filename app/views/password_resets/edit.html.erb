@@ -22,7 +22,6 @@
         }
 
         // Password strength meter
-
         var shortPass = 'Too short'
         var badPass = 'Bad'
         var goodPass = 'Good'
@@ -83,7 +82,7 @@
 
 <%= form_for @user, { :url => password_reset_path(params[:id]) }  do |f| %>
     <p>
-    <h1> Resetting password for <%= @user.human_name %>'s account.</h1>
+    <h1> Setting password for <%= @user.human_name %>'s account.</h1>
     </p>
     <p>
       <b>Instructions</b>

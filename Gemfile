@@ -21,7 +21,7 @@ gem 'devise'
 
 gem "ckeditor", "3.6.3"
 
-gem "net-ldap", "~> 0.3.1"
+gem 'net-ldap', '~> 0.3.1'
 
 
 gem 'bundler'
@@ -43,7 +43,7 @@ gem 'exception_notification', :require => 'exception_notifier'
 
 gem 'pg'
 
-gem "recaptcha", :require => "recaptcha/rails"
+gem 'recaptcha', :require => 'recaptcha/rails'
 
 gem 'cancan'
 

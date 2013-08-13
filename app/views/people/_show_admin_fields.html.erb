@@ -117,7 +117,7 @@
         <tr>
             <td>Active Directory Account></td>
             <td>
-              <%= check_box_tag 'create_active_directory_account', 1, person.is_directory_enabled? %>
+              <%= check_box_tag 'create_active_directory_account', 1, active_directory_account_created_at? %>
               <%= check_box_tag 'suspend_active_directory_account', 1, false %>
             </td>
         </tr>
@@ -155,7 +155,7 @@
         <tr>
           <td>Active Directory Account</td>
             <td>
-              <%= check_box_tag 'create_active_directory_account', 1, person.is_directory_enabled?, :disabled=>person.is_directory_enabled? %>
+              <%= check_box_tag 'create_active_directory_account', 1, person.active_directory_account_created_at.nil?, :disabled=>person.active_directory_account_created_at.nil? %>
               <%= f.label 'Create' %>
               <%= check_box_tag 'suspend_active_directory_account', 1, false%>
               <%= f.label 'Disable' %>

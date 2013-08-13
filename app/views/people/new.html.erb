@@ -15,6 +15,9 @@
         check_email();
         check_webiso_account();
         update_graduation_year();
+        toggle_student_user_attributes();
+        toggle_masters_phd_program();
+        toggle_SE_tracks();
         });
     <% end %>
 
@@ -96,7 +99,7 @@
             add_loader(node, 'Checking email...');
         }
 
-        // Checks whether the specified webiso accoutn is already in use
+        // Checks whether the specified webiso account is already in use
         function check_webiso_account() {
             var email = document.forms["new_user"].user_webiso_account.value
 
@@ -147,18 +150,20 @@
              }
          }
 
-        // Toggle student masters and phd programs
+        // Toggle masters and phd programs
          function toggle_masters_phd_program(){
              if($("#graduate_program").val()=="MS"){
                  $("#masters_courses").fadeIn();
+                 $("#SE_tracks").fadeIn();
                  $("#phd_courses").hide();
              }else if($("#graduate_program").val()=="PhD"){
-                  $("#masters_courses").hide();
+                 $("#masters_courses").hide();
+                 $("#SE_tracks").hide();
                  $("#phd_courses").fadeIn();
              }
          }
 
-        // Toggle student masters courses
+        // Toggle student SE courses
         function toggle_SE_tracks(){
             if($("#masters_course").val()=="SE"){
                 $("#SE_tracks").fadeIn();
@@ -217,7 +222,6 @@
       <%= f.text_field :email, :onblur => "check_email()" %>
       <!-- We will be creating google app accounts through Active Directory
       <%#= check_box_tag("create_google_email", 1, true) %> Create google email account? -->
-      <%= check_box_tag("create_active_directory_account", 1, false) %> Create active directory account?
       <div id="email_warning"></div>
     </p>
     <p>
@@ -254,7 +258,7 @@
     <%= field_set_tag nil, :class=>'cmu_table', do %>
         <p>
           <%= f.check_box :is_part_time, :onchange => "update_graduation_year()" %>
-          <%= f.label :is_part_time, "Is part time student?" %> <br/> <br/>
+          <%= f.label :is_part_time, "Is part time student?" %> <br/>
         </p>
         <p>
          <%= select_tag :graduation_year, options_for_select((Time.now.year..Time.now.year+5).to_a), :selected=>Time.now.year+1, :style => "width:70px" %>  Graduation year

@@ -6,6 +6,11 @@ class PasswordResetsController < ApplicationController
     redirect_to new_password_reset_path
   end
 
+  # Display edit password page
+  def show
+    redirect_to edit_password_reset_path
+  end
+
   # Create new password reset request
   def create
     @user = User.find_by_email(params[:cmu_email])
@@ -14,11 +19,11 @@ class PasswordResetsController < ApplicationController
     if verify_recaptcha(:model => @user, :attribute => "verification code")
       if @user && @user.personal_email == params[:personal_email]
         @active_directory_services.send_password_reset_token(@user)
+        redirect_to root_url, :notice => "Password reset instructions have been sent to #{@user.personal_email}"
       else
         flash[:error] = "Your email entries did not match our records. Please try again or contact help@sv.cmu.edu"
         redirect_to new_password_reset_path and return
       end
-      redirect_to root_url, :notice => "Password reset instructions have been sent to #{@user.personal_email}."
     else
       flash[:error] = "Verification code is wrong"
       redirect_to new_password_reset_path
@@ -35,32 +40,51 @@ class PasswordResetsController < ApplicationController
   # Performs actual password reset
   def update
     @user = User.find_by_password_reset_token!(params[:id])
-    @active_directory_services = ActiveDirectory.new
     respond_to do |format|
-      if @user.password_reset_sent_at>2.hours.ago
-        if params[:newPassword]
-          if Ldap.authenticate
-            message = @active_directory_services.reset_password(@user, params[:new_password])
-            if message == "Success"
-              if @user.active_directory_account_created_at>10.minutes.ago
-                flash[:notice] = "You have successfully created your account! You can log in with your new password."
-                PersonMailer.general_account_information(@user).deliver
-              else
-                flash[:notice] = "Your password was successfully changed! Login with your new password."
-                PersonMailer.active_directory_password_change_notification(@user).deliver
-              end
-              format.html {redirect_to root_url}
+      if @user && !@user.password_reset_sent_at.nil? && @user.password_reset_sent_at>2.hours.ago # If request was sent within two hours
+        @active_directory_services = ActiveDirectory.new
+        if params[:new_password]
+          message = @active_directory_services.reset_password(@user, params[:new_password])
+
+          if message == "Success"
+            if !@user.active_directory_account_created_at.nil? && @user.active_directory_account_created_at>10.minutes.ago
+              flash[:notice] = "You have successfully created your account! You can log in with your new password."
+              PersonMailer.general_account_information(@user).deliver
             else
-              flash[:error]="Password does not meet required minimum complexity. Read instructions below."
-              redirect_to edit_password_reset_path and return
+              flash[:notice] = "Your password was successfully changed! Login with your new password."
+              PersonMailer.active_directory_password_change_notification(@user).deliver
             end
-          else
-            flash[:error] = "Cannot contact server."
+            format.html {redirect_to root_url}
+          elsif message.is_a?(String)
+
+            # Alert help@sv.cmu.edu
+            options = {:to => "help@sv.cmu.edu", :cc => "", :subject => "Error from #{@person.human_name}",
+                       :message => message, :url => "", :url_label => ""}
+            GenericMailer.email(options).deliver
+
+            flash[:error]="Password does not meet required minimum complexity. Read instructions below or report to help@sv.cmu.edu."
             format.html {redirect_to edit_password_reset_path}
+            redirect_to edit_password_reset_path and return
+
+          else
+            message = "Cannot contact server. Report this to help@sv.cmu.edu"
+
+            # Alert help@sv.cmu.edu
+            options = {:to => "help@sv.cmu.edu", :cc => "", :subject => "Error from #{@user.human_name}",
+                       :message => "Server was unreachable at #{Time.now.to_s}", :url => "", :url_label => ""}
+            GenericMailer.email(options).deliver
+
+            flash[:error] = "Cannot contact server. Report this to help@sv.cmu.edu"
+            format.html {redirect_to edit_password_reset_path}
+            redirect_to edit_password_reset_path and return
           end
+
+        else
+          flash[:error]="New password cannot be empty. Try again."
+          redirect_to edit_password_reset_path and return
         end
       else
-        flash[:error] = "Password reset link has expired #{@user.password_reset_sent_at}"+"#{2.hours.ago}"+"  #{@user.password_reset_sent_at < 2.hours.ago}"
+        flash[:error] = "Password reset link has expired. You may send a new link."
         format.html {redirect_to new_password_reset_path}
       end
     end

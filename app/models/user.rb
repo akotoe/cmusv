@@ -8,7 +8,7 @@ class User < ActiveRecord::Base
 
 
   # Setup accessible (or protected) attributes for your model
-  attr_accessible :adobe_created, :biography, :email, :first_name, :github, :graduation_year, :human_name, :image_uri, :is_active, :is_adobe_connect_host, :is_ga_promised, :is_alumnus, :is_part_time, :is_staff, :is_student, :last_name, :legal_first_name, :local_near_remote, :login, :masters_program, :masters_track, :msdnaa_created, :office, :office_hours, :organization_name, :personal_email, :photo_first_content_type, :photo_first_file_name, :photo_second_content_type, :photo_second_file_name, :photo_custom_content_type, :photo_custom_file_name, :pronunciation, :skype, :sponsored_project_effort_last_emailed, :strength1_id, :strength2_id, :strength3_id, :strength4_id, :strength5_id, :telephone1, :telephone1_label, :telephone2, :telephone2_label, :telephone3, :telephone3_label, :telephone4, :telephone4_label, :tigris, :title, :twiki_name, :user_text, :webiso_account, :work_city, :work_country, :work_state, :linked_in, :facebook, :twitter, :google_plus, :people_search_first_accessed_at, :is_profile_valid, :image_uri_first, :image_uri_second, :image_uri_custom, :photo_selection
+  attr_accessible :adobe_created, :biography, :email, :first_name, :github, :graduation_year, :human_name, :image_uri, :is_active, :is_adobe_connect_host, :is_ga_promised, :is_alumnus, :is_part_time, :is_staff, :is_student, :last_name, :legal_first_name, :local_near_remote, :login, :masters_program, :masters_track, :msdnaa_created, :office, :office_hours, :organization_name, :personal_email, :photo_first_content_type, :photo_first_file_name, :photo_second_content_type, :photo_second_file_name, :photo_custom_content_type, :photo_custom_file_name, :pronunciation, :skype, :sponsored_project_effort_last_emailed, :strength1_id, :strength2_id, :strength3_id, :strength4_id, :strength5_id, :telephone1, :telephone1_label, :telephone2, :telephone2_label, :telephone3, :telephone3_label, :telephone4, :telephone4_label, :tigris, :title, :twiki_name, :user_text, :webiso_account, :work_city, :work_country, :work_state, :linked_in, :facebook, :twitter, :google_plus, :people_search_first_accessed_at, :is_profile_valid, :image_uri_first, :image_uri_second, :image_uri_custom, :photo_selection, :new_user_token
   #These attributes are not accessible , :created_at, :current_sign_in_at, :current_sign_in_ip, :effort_log_warning_email, :google_created, :is_admin, :last_sign_in_at, :last_sign_in_ip, :remember_created_at,  :sign_in_count,  :sign_in_count_old,  :twiki_created,  :updated_at,  :updated_by_user_id,  :version,  :yammer_created, :course_tools_view, :course_index_view, :expires_at
 
   #We version the user table except for some system change reasons e.g. the Scotty Dog effort log warning email caused this save to happen
@@ -352,52 +352,6 @@ class User < ActiveRecord::Base
   #  return true
   #end
 
-  #
-  # Creates an Active Directory account for the user
-  # If this fails, it returns an error message as a string, else it returns true
-  #
-  def create_active_directory_account
-    if !is_directory_enabled?
-      require 'activedirectory/activedirectory'
-      # reject blank emails
-      return "Empty email address" if self.email.blank?
-
-      # log what is currently happening
-      logger.debug("Attempting to create active directory account for " + self.email)
-
-      # extract domain from email
-      domain = self.email.split('@')[1]
-
-      # Confirm domain name accuracy
-      if domain != GOOGLE_DOMAIN
-        logger.debug("Domain (" + domain + ") is not the same as the google domain (" + GOOGLE_DOMAIN)
-        return "Domain (" + domain + ") is not the same as the google domain (" + GOOGLE_DOMAIN + ")"
-      end
-
-      # Try to transact against active directory, rescue any exceptions
-      begin
-        # Establishes Standard/SSL connection to Active Directory server, returns an ldap connection
-        connection = Ldap.configure
-
-        # Add this user to active directory
-        connection.add(:dn=>get_dn,:attributes=>get_attributes)
-        logger.debug(connection.get_operation_result)
-
-        # Activate user account #still not activating, I need to find out why so
-        connection.replace_attribute get_dn, :userAccountControl, "512"
-        logger.debug(connection.get_operation_result)
-
-      rescue Net::LDAP::LdapError=>e
-        logger.debug(e)
-        return e
-      end
-      self.active_directory_account_created_at = Time.now()
-      self.save
-      return true
-    end
-
-  end
-
 # attribute :github
 # If the user has not set this attribute, then ask the user to do so
   def notify_about_missing_field(attribute, message)
@@ -414,7 +368,7 @@ class User < ActiveRecord::Base
 
   def should_be_redirected?
     if self.people_search_first_accessed_at.nil?
-      self.people_search_first_accessed_at = Time.now
+      self.people_search_first_accessed_at = Time.now()
       self.save!
     end
     #self.first_access = nil
@@ -448,6 +402,8 @@ class User < ActiveRecord::Base
 
   def set_password_reset_token
     self.password_reset_token = SecureRandom.urlsafe_base64
+    self.password_reset_sent_at = Time.now
+    self.save!
   end
 
   protected

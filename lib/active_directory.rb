@@ -1,4 +1,4 @@
-require 'net/ldap'
+
 
 # This class provides active directory services
 class ActiveDirectory
@@ -6,9 +6,9 @@ class ActiveDirectory
   # Create an Active Directory account for a user
   # Error out if user's email address is blank or domain is not Google domain
   # If this fails, return an error message as a string, else return void
-  # The return message is "Success", "Unwilling to perform", "Entity exists", "No such object", "Could not bind to server"
+  # The return message is "Success", "Unwilling to perform", "Entity exists", "No such object", "Could contact to server", "True"
   def create_account(user)
-    return "Empty email address" if user.email.blank?
+    return "Empty email address. Edit your profile page" if user.email.blank?
 
     domain = user.email.split('@')[1]
     if domain != GOOGLE_DOMAIN
@@ -19,15 +19,17 @@ class ActiveDirectory
       @connection.add(:dn => user.ldap_distinguished_name(user), :attributes => ldap_attributes(user))
 
       message = @connection.get_operation_result.message
+
       if message == "Success"
         user.active_directory_account_created_at=Time.now()
         user.save
-      else
-        return message
+        return true
       end
 
+      return "Could not create account. Contact help@sv.cmu.edu."
+
     else
-      return "Could not bind to active directory server."
+      return "Server unreachable. Contact help@sv.cmu.edu."
     end
   end
 
