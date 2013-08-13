@@ -58,7 +58,7 @@ class PasswordResetsController < ApplicationController
           elsif message.is_a?(String)
 
             # Alert help@sv.cmu.edu
-            options = {:to => "help@sv.cmu.edu", :cc => "", :subject => "Error from #{@person.human_name}",
+            options = {:to => "help@sv.cmu.edu", :cc => "", :subject => "Error from #{@user.human_name}",
                        :message => message, :url => "", :url_label => ""}
             GenericMailer.email(options).deliver
 
