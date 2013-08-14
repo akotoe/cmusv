@@ -1,7 +1,14 @@
-
+require 'net/ldap'
 
 # This class provides active directory services
 class ActiveDirectory
+
+  # Initialize connection to active directory
+  def initialize
+    @connection = Net::LDAP.new(:host => LDAPConfig.host, :port => LDAPConfig.port)
+    @connection.encryption(:method => :simple_tls) unless !LDAPConfig.is_encrypted?
+    @connection.auth LDAPConfig.username, LDAPConfig.password unless LDAPConfig.username.nil? || LDAPConfig.password.nil?
+  end
 
   # Create an Active Directory account for a user
   # Error out if user's email address is blank or domain is not Google domain
@@ -16,7 +23,7 @@ class ActiveDirectory
     end
 
     if self.bind
-      @connection.add(:dn => user.ldap_distinguished_name(user), :attributes => ldap_attributes(user))
+      @connection.add(:dn => ldap_distinguished_name(user), :attributes => ldap_attributes(user))
 
       message = @connection.get_operation_result.message
 
@@ -26,19 +33,11 @@ class ActiveDirectory
         return true
       end
 
-      return "Could not create account. Contact help@sv.cmu.edu."
+      return "#{message} Could not create account. Contact help@sv.cmu.edu."
 
     else
-      return "Server unreachable. Contact help@sv.cmu.edu."
+      return "Server unavailable. Contact help@sv.cmu.edu. "
     end
-  end
-
-
-  # Initialize connection to active directory
-  def self.initialize
-    @connection = Net::LDAP.new(:host => LDAPConfig.host, :port => LDAPConfig.port)
-    @connection.encryption(:method => :simple_tls) unless !LDAPConfig.is_encrypted?
-    @connection.auth LDAPConfig.username, LDAPConfig.password unless LDAPConfig.username.nil? || LDAPConfig.password.nil?
   end
 
   # Attempt to bind to active directory, time out after N seconds, return true or false
@@ -73,7 +72,7 @@ class ActiveDirectory
   # Build user distinguished name for active directory account
   def ldap_distinguished_name(user)
     distinguished_name = "cn=#{user.human_name},"
-    base_distinguished_name = "dc=cmusv,dc=sv,dc=cmu,dc=local"
+    base_distinguished_name = "dc=ds,dc=sv,dc=cmu,dc=edu"
 
     if user.is_staff
       distinguished_name += "ou=Staff,ou=Sync,"

@@ -21,7 +21,7 @@ gem 'devise'
 
 gem "ckeditor", "3.6.3"
 
-gem 'net-ldap', '~> 0.3.1'
+gem "net-ldap", "~> 0.3.1"
 
 
 gem 'bundler'
