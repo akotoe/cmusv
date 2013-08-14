@@ -649,13 +649,14 @@ class PeopleController < ApplicationController
         end
       end
 
-      # advanced search filter parameters
-      people = people.where("graduation_year = ?","#{params[:graduation_year]}") unless params[:graduation_year].blank?
-      people = people.where("masters_program = ?","#{params[:masters_program]}") unless params[:masters_program].blank?
-      people = people.where("is_active = 't'") unless params[:search_inactive] == 't'
-      people = people.joins(:registrations).where("registrations.course_id=?","#{params[:course_id]}") unless params[:course_id].blank?
-      people = people.order("first_name ASC, last_name ASC")
-    end
+    # advanced search filter parameters
+    people = people.where("graduation_year = ?","#{params[:graduation_year]}") unless params[:graduation_year].blank?
+    people = people.where("masters_program = ?","#{params[:masters_program]}") unless params[:masters_program].blank?
+    people = people.where("is_active = 't'") unless params[:search_inactive] == 't'
+    people = people.joins(:registrations).where("registrations.course_id=?","#{params[:course_id]}") unless params[:course_id].blank?
+#    people = people.joins(:teams).where("teams.course_id=?","#{params[:course_id]}") unless params[:course_id].blank?
+    people = people.order("first_name ASC, last_name ASC")
+  end
 
     # helper function that prioritizes the search results (if name was entered as part of search result, that is shown first vs it being found in bio/profile etc)
     def prioritize_search_results

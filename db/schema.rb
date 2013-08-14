@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130801073809) do
+ActiveRecord::Schema.define(:version => 20130808222435) do
 
   create_table "ad_group_memberships", :force => true do |t|
     t.integer  "ad_user_id"
@@ -385,9 +385,9 @@ ActiveRecord::Schema.define(:version => 20130801073809) do
     t.string   "url"
     t.boolean  "is_editable_by_all",      :default => false
     t.boolean  "is_duplicated_page",      :default => false
-    t.boolean  "is_viewable_by_all",      :default => true
     t.integer  "current_edit_by_user_id"
     t.datetime "current_edit_started_at"
+    t.string   "viewable_by",             :default => "users"
   end
 
   add_index "pages", ["course_id"], :name => "index_pages_on_course_id"
