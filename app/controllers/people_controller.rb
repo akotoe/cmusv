@@ -248,8 +248,21 @@ class PeopleController < ApplicationController
     @person.image_uri_custom = "/images/mascot.jpg"
     @person.photo_selection = "first"
 
+    # I added this code to convert organization units to match the current database setup
+    # We surely need to alter the database
+    if params[:graduate_program] == "PhD"
+      @person.masters_program = "PhD"
+    else
+      @person.masters_program = params[:masters_program]
+    end
+    @person.masters_track = params[:se_track] if @person.masters_program!="PhD"
+
+    Rails.logger.info("MASTERS COURSE #{params[:masters_course]}")
+
     respond_to do |format|
       if @person.save
+
+
 
         # Send welcome email link if account creation type is staged
         # Else redirect to profile edit page and complete rest of creation process

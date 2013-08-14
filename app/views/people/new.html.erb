@@ -153,11 +153,10 @@
         // Toggle masters and phd programs
          function toggle_masters_phd_program(){
              if($("#graduate_program").val()=="MS"){
-                 $("#masters_courses").fadeIn();
-                 $("#SE_tracks").fadeIn();
+                 $("#masters_programs").fadeIn();
                  $("#phd_courses").hide();
              }else if($("#graduate_program").val()=="PhD"){
-                 $("#masters_courses").hide();
+                 $("#masters_programs").hide();
                  $("#SE_tracks").hide();
                  $("#phd_courses").fadeIn();
              }
@@ -165,7 +164,7 @@
 
         // Toggle student SE courses
         function toggle_SE_tracks(){
-            if($("#masters_course").val()=="SE"){
+            if($("#masters_program").val()=="SE"){
                 $("#SE_tracks").fadeIn();
             }else{
                 $("#SE_tracks").fadeOut();
@@ -257,7 +256,7 @@
     <h2>Student Options</h2>
     <%= field_set_tag nil, :class=>'cmu_table', do %>
         <p>
-          <%= f.check_box :is_part_time, :onchange => "update_graduation_year()" %>
+          <%= f.check_box :is_part_time, :onchange => "update_graduation_year()"%>
           <%= f.label :is_part_time, "Is part time student?" %> <br/>
         </p>
         <p>
@@ -267,9 +266,9 @@
           <%= select_tag :graduate_program, options_for_select(["MS","PhD"]), :style => "width:70px", :onchange=>"toggle_masters_phd_program()" %> Graduate program
         </p>
 
-        <div id="masters_courses">
+        <div id="masters_programs">
           <p>
-            <%= select_tag :masters_course, options_for_select(["ECE","INI", "SE", "SM"]), :style => "width:70px", :onchange=>"toggle_SE_tracks()" %> Masters course
+            <%= select_tag :masters_program, options_for_select(["ECE","INI", "SE", "SM"]), :style => "width:70px", :onchange=>"toggle_SE_tracks()" %> Masters course
           </p>
         </div>
 

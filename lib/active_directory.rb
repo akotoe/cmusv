@@ -33,8 +33,12 @@ class ActiveDirectory
         return true
       end
 
-      return "#{message} Could not create account. Contact help@sv.cmu.edu."
+      # Alert help@sv.cmu.edu
+      options = {:to => "help@sv.cmu.edu", :cc => "", :subject => "Error from #{user.human_name}",
+                 :message => message, :url => "", :url_label => ""}
+      GenericMailer.email(options).deliver
 
+      return "Could not create account. Contact help@sv.cmu.edu."
     else
       return "Server unavailable. Contact help@sv.cmu.edu. "
     end
@@ -77,7 +81,7 @@ class ActiveDirectory
     if user.is_staff
       distinguished_name += "ou=Staff,ou=Sync,"
     elsif !user.masters_program.blank?
-      distinguished_name += "ou=" + user.masters_program + ",ou=Students,ou=Sync,"
+      distinguished_name += "ou=" + user.masters_program + ",ou=Student,ou=Sync,"
     else
       distinguished_name += "ou=Sync,"
     end
