@@ -65,7 +65,7 @@ CMUEducation::Application.configure do
       :address => "smtp.gmail.com",
       :port => 587,
       :authentication => :plain,
-      :domain => ENV['smtp.gmail.com'],
+      :domain => "smtp.gmail.com",
       :user_name => ENV['GMAIL_SMTP_USER'],
       :password => ENV['GMAIL_SMTP_PASSWORD'],
       :enable_starttls_auto => true
