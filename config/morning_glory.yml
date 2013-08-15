@@ -1,16 +1,7 @@
 production:
-  delete_prev_rev: false
-  bucket: cmusv-rails-mfse-production
-  s3_logging_enabled: false
+  bucket: cmusv-rails-mfse-development
   enabled: false
-  asset_directories:
-  - images
-  - javascripts
-  - stylesheets
-  - cmu_sv
-  - cmu_sv_simple
-  - charts
-  revision: 0cfe
+  revision: 45c2
 development:
   bucket: cmusv-rails-mfse-development
   enabled: false
