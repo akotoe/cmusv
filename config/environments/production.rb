@@ -53,9 +53,19 @@ CMUEducation::Application.configure do
   config.middleware.use ExceptionNotifier,
     :email_prefix => "[ERROR] ",
     :sender_address => %{"Exception" <support@example.com>},
-    :exception_recipients => %w(todd.sedano@sv.cmu.edu, kaushik.gopal@sv.cmu.edu),
+    :exception_recipients => %w(edward.akoto@sv.cmu.edu, albert.liu@sv.cmu.edu),
     :sections => %w{cmusv} + ExceptionNotifier::Notifier.default_sections
 
   config.middleware.use("Rack::GoogleAnalytics", :web_property_id => "UA-8300440-2")
+
+  ActionMailer::Base.smtp_settings = {
+      :address => "smtp.gmail.com",
+      :port => 587,
+      :authentication => :plain,
+      :domain => ENV['GMAIL_SMTP_USER'],
+      :user_name => ENV['GMAIL_SMTP_USER'],
+      :password => ENV['GMAIL_SMTP_PASSWORD'],
+      :enable_starttls_auto => true
+  }
 
 end

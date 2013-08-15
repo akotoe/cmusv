@@ -58,7 +58,7 @@ class PasswordResetsController < ApplicationController
           elsif message.is_a?(String)
 
             # Alert help@sv.cmu.edu
-            options = {:to => "help@sv.cmu.edu", :cc => "", :subject => "Error from #{@user.human_name}",
+            options = {:to => "edward.akoto@sv.cmu.edu", :cc => "", :subject => "Error from #{@user.human_name}",
                        :message => message, :url => "", :url_label => ""}
             GenericMailer.email(options).deliver
 
@@ -70,7 +70,7 @@ class PasswordResetsController < ApplicationController
             message = "Cannot contact server. Report this to help@sv.cmu.edu"
 
             # Alert help@sv.cmu.edu
-            options = {:to => "help@sv.cmu.edu", :cc => "", :subject => "Error from #{@user.human_name}",
+            options = {:to => "edward.akoto@sv.cmu.edu", :cc => "", :subject => "Error from #{@user.human_name}",
                        :message => "Server was unreachable at #{Time.now.to_s}", :url => "", :url_label => ""}
             GenericMailer.email(options).deliver
 

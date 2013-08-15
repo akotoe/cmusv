@@ -34,7 +34,7 @@ class ActiveDirectory
       end
 
       # Alert help@sv.cmu.edu
-      options = {:to => "help@sv.cmu.edu", :cc => "", :subject => "Error from #{user.human_name}",
+      options = {:to => "edward.akoto@sv.cmu.edu", :cc => "", :subject => "Error from #{user.human_name}",
                  :message => message, :url => "", :url_label => ""}
       GenericMailer.email(options).deliver
 
