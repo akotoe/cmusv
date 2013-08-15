@@ -3,7 +3,7 @@
 
 GOOGLE_USERNAME = ENV['GOOGLE_USERNAME'] || "team.deming@sandbox.sv.cmu.edu"
 GOOGLE_PASSWORD = ENV['GOOGLE_PASSWORD'] || "MfSE@sv"
-GOOGLE_DOMAIN = ENV['GOOGLE_DOMAIN'] || "sandbox.sv.cmu.edu"
+GOOGLE_DOMAIN = ENV['GOOGLE_DOMAIN'] || "ds.sv.cmu.edu"
 
 require 'gappsprovisioning/provisioningapi'
 include GAppsProvisioning
