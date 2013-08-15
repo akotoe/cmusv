@@ -40,6 +40,9 @@ CMUEducation::Application.configure do
   # Disable delivery errors, bad email addresses will be ignored
   # config.action_mailer.raise_delivery_errors = false
 
+  # Perform email deliveries
+  ActionMailer::Base.perform_deliveries = true
+
   # Enable threaded mode
   # config.threadsafe!
 
@@ -62,7 +65,7 @@ CMUEducation::Application.configure do
       :address => "smtp.gmail.com",
       :port => 587,
       :authentication => :plain,
-      :domain => ENV['GMAIL_SMTP_USER'],
+      :domain => ENV['smtp.gmail.com'],
       :user_name => ENV['GMAIL_SMTP_USER'],
       :password => ENV['GMAIL_SMTP_PASSWORD'],
       :enable_starttls_auto => true
