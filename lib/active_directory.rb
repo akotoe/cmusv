@@ -51,7 +51,7 @@ class ActiveDirectory
       Timeout::timeout(10) do
         return (@connection.bind) ? true : false
       end
-    rescue Timeout::Error
+    rescue
       return false
     end
   end
