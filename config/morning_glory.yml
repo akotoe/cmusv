@@ -2,7 +2,7 @@ production:
   delete_prev_rev: false
   bucket: cmusv-rails-mfse-production
   s3_logging_enabled: false
-  enabled: true
+  enabled: false
   asset_directories:
   - images
   - javascripts
