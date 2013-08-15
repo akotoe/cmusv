@@ -114,14 +114,6 @@
             <td><%= f.label :is_adobe_connect_host, "Is adobe host" %></td>
             <td><%= f.check_box :is_adobe_connect_host, :disabled => 'disabled' %></td>
         </tr>
-        <tr>
-            <td>Active Directory Account></td>
-            <td>
-              <%= check_box_tag 'create_active_directory_account', 1, person.active_directory_account_created_at? %>
-              <%= check_box_tag 'suspend_active_directory_account', 1, false %>
-            </td>
-        </tr>
-
 
         <% else %>
         <tr>
