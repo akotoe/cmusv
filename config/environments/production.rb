@@ -62,12 +62,12 @@ CMUEducation::Application.configure do
   config.middleware.use("Rack::GoogleAnalytics", :web_property_id => "UA-8300440-2")
 
   ActionMailer::Base.smtp_settings = {
-      :address => "smtp.gmail.com",
-      :port => 587,
+      :address        => 'smtp.sendgrid.net',
+      :port           => '587',
       :authentication => :plain,
-      :domain => ENV['GMAIL_SMTP_USER'],
-      :user_name => ENV['GMAIL_SMTP_USER'],
-      :password => ENV['GMAIL_SMTP_PASSWORD'],
+      :user_name      => ENV['SENDGRID_USERNAME'],
+      :password       => ENV['SENDGRID_PASSWORD'],
+      :domain         => 'heroku.com',
       :enable_starttls_auto => true
   }
 
