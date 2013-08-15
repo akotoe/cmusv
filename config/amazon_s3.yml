@@ -1,14 +1,17 @@
+#We need to keep this file for Morning Glory
+
 development:
-  username: fall.2010.mfse@sandbox.sv.cmu.edu
-  password: 5tgb6yhn
-  google_domain: sandbox.sv.cmu.edu
+  access_key_id:
+  secret_access_key:
+  bucket:
 
 test:
-  username: fall.2010.mfse@sandbox.sv.cmu.edu
-  password: 5tgb6yhn
-  google_domain: sandbox.sv.cmu.edu
+  access_key_id: some_random_placeholder
+  secret_access_key: so_that_travis_will_work
+  bucket: cmusv-travis
 
 production:
-  username: fall.2010.mfse@sandbox.sv.cmu.edu
-  password: 5tgb6yhn
-  google_domain: sandbox.sv.cmu.edu
+  access_key_id:
+  secret_access_key:
+  bucket:
+

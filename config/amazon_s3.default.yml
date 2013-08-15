@@ -1,9 +1,9 @@
 #We need to keep this file for Morning Glory
 
 development:
-  access_key_id: 
-  secret_access_key: 
-  bucket: 
+  access_key_id:
+  secret_access_key:
+  bucket:
 
 test:
   access_key_id: some_random_placeholder
@@ -11,7 +11,7 @@ test:
   bucket: cmusv-travis
 
 production:
-  access_key_id: 
-  secret_access_key: 
-  bucket: 
+  access_key_id:
+  secret_access_key:
+  bucket:
 
