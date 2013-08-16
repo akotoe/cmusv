@@ -13,12 +13,12 @@ describe "ActiveDirectory" do
   end
 
   it 'ldap_distinguished_name method returns valid distinguished name for staff' do
-    @active_directory_services.ldap_distinguished_name(@faculty_frank).should eq("cn=Faculty Frank,ou=Staff,ou=Sync,dc=cmusv,dc=sv,dc=cmu,dc=local")
+    @active_directory_services.ldap_distinguished_name(@faculty_frank).should eq("cn=Faculty Frank,ou=Staff,ou=Sync,dc=ds,dc=sv,dc=cmu,dc=edu")
   end
 
   it 'ldap_distinguished_name method returns valid distinguished name for student' do
     @student_sam = FactoryGirl.create(:student_sam, masters_program: 'SE')
-    @active_directory_services.ldap_distinguished_name(@student_sam).should eq("cn=Student Sam,ou=SE,ou=Students,ou=Sync,dc=cmusv,dc=sv,dc=cmu,dc=local")
+    @active_directory_services.ldap_distinguished_name(@student_sam).should eq("cn=Student Sam,ou=SE,ou=Students,ou=Sync,dc=ds,dc=sv,dc=cmu,dc=edu")
   end
 
   it 'ldap_attributes method returns necessary ldap attributes' do
