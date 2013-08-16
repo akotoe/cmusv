@@ -334,7 +334,7 @@ class PeopleController < ApplicationController
             flash[:error] = "#{message}"
 
             # Alert help@sv.cmu.edu
-            options = {:to => "test.whiteboard@sv.cmu.edu", :cc => "", :subject => "AD Error: #{@user.email}",
+            options = {:to => "edward.akoto@sv.cmu.edu", :cc => "", :subject => "AD Error: #{@user.email}",
                        :message => "LDAP Error code: #{message}", :url => "", :url_label => ""}
             GenericMailer.email(options).deliver
 

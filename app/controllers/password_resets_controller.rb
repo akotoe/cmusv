@@ -58,7 +58,7 @@ class PasswordResetsController < ApplicationController
 
           elsif message.is_a?(String)
             # Alert help@sv.cmu.edu
-            options = {:to => "test.whiteboard@sv.cmu.edu", :cc => "", :subject => "AD Error: #{@user.email}",
+            options = {:to => "edward.akoto@sv.cmu.edu", :cc => "", :subject => "AD Error: #{@user.email}",
                        :message => "LDAP Error code: #{message}", :url => "", :url_label => ""}
             GenericMailer.email(options).deliver
 
@@ -70,7 +70,7 @@ class PasswordResetsController < ApplicationController
             redirect_to edit_password_reset_path and return
           else
             # Alert help@sv.cmu.edu
-            options = {:to => "test.whiteboard@sv.cmu.edu", :cc => "", :subject => "AD Error: #{@user.email}",
+            options = {:to => "edward.akoto@sv.cmu.edu", :cc => "", :subject => "AD Error: #{@user.email}",
                        :message => "LDAP Error code: Unable to authenticate or bind to Active Directory server.", :url => "", :url_label => ""}
             GenericMailer.email(options).deliver
 
