@@ -356,10 +356,14 @@ class PeopleController < ApplicationController
                        :message => "LDAP Error code: #{message}", :url => "", :url_label => ""}
             GenericMailer.email(options).deliver
 
-            if current_user.is_admin?
-              format.html { render :action=>"edit" }
-            else
+            if current_user.nil?
               format.html { render :action=>"new_user" }
+            else
+              if current_user.is_admin?
+                format.html { render :action=>"edit" }
+              else
+                format.html { render :action=>"new_user" }
+              end
             end
 
             format.xml { render :xml => message }
