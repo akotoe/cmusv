@@ -1,7 +1,7 @@
 class GenericMailer < ActionMailer::Base
 
   default :from => 'scotty.dog@sv.cmu.edu',
-          :bcc => "rails.app@sv.cmu.edu"
+          :bcc => ""
 
   def email(options = {})
     @to = options[:to]
