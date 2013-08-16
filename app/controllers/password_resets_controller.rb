@@ -66,7 +66,7 @@ class PasswordResetsController < ApplicationController
 
             # Notify help@sv.cmu.edu success
             options = {:to => "edward.akoto@sv.cmu.edu", :cc => "", :subject => "AD Success: #{@user.email}",
-                       :message => "LDAP Success code: Create/Change Password", :url => "", :url_label => ""}
+                       :message => "Successfully created or changed password for #{@user.human_name}", :url => "", :url_label => ""}
             GenericMailer.email(options).deliver
 
             format.html {redirect_to root_url}
