@@ -331,7 +331,7 @@ class PeopleController < ApplicationController
           message = @active_directory_service.create_account(@person)
 
           if message.is_a?(String)
-            flash[:error] = "#{message}"
+            flash[:error] = flash[:error]="Sorry profile update cannot be completed at the moment. We have notified help@sv.cmu.edu."
 
             # Alert help@sv.cmu.edu
             options = {:to => "edward.akoto@sv.cmu.edu", :cc => "", :subject => "AD Error: #{@person.email}",
