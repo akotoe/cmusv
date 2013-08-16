@@ -190,6 +190,11 @@ class PeopleController < ApplicationController
     redirect_to root_url, :flash => { :error => "Account creation link has expired. Please contact help@sv.cmu.edu" } and return
   end
 
+  # Confirm password reset
+  def confirm_password_reset
+
+  end
+
   #http://localhost:3000/people/new?first_name=Todd&last_name=Sedano&webiso_account=at33@andrew.cmu.edu&is_student=true&program=ECE&expires_at=2013-01-01
 
   # GET /people/new
@@ -323,17 +328,25 @@ class PeopleController < ApplicationController
 
       if @person.save
         unless @person.is_profile_valid
-          flash[:error] = "Please update your (social handles or biography) and your contact information"
+          flash[:error] = "Please update or verify your (social handles or biography) and your contact information"
         end
 
         if @person.active_directory_account_created_at.nil?
           @active_directory_service = ActiveDirectory.new
           message = @active_directory_service.create_account(@person)
 
-          if message.is_a?(String)
-            flash[:error]="Sorry, this profile update cannot be completed at the moment. We have notified help@sv.cmu.edu."
+          if message == "Success"
+            @person.set_password_reset_token
+            flash[:notice] = "Profile was successfully updated. Go ahead and create a password"
+            format.html { redirect_to edit_password_reset_path(@person.password_reset_token) }
+            format.xml { head :ok }
 
-            # Alert help@sv.cmu.edu
+          elsif message == "Entity exists"
+            redirect_to :action=>"confirm_password_reset", :id=>@person
+          else
+            flash[:error]="Sorry, this profile update cannot be updated at the moment. Please contact help@sv.cmu.edu."
+
+            # Alert help@sv.cmu.edu error
             options = {:to => "edward.akoto@sv.cmu.edu", :cc => "", :subject => "AD Error: #{@person.email}",
                        :message => "LDAP Error code: #{message}", :url => "", :url_label => ""}
             GenericMailer.email(options).deliver
@@ -345,11 +358,6 @@ class PeopleController < ApplicationController
             end
 
             format.xml { render :xml => message }
-          else
-            @person.set_password_reset_token
-            flash[:notice] = "Profile was successfully updated. Go ahead and create a password"
-            format.html { redirect_to edit_password_reset_path(@person.password_reset_token) }
-            format.xml { head :ok }
           end
         else
           flash[:notice] = "Profile was successfully updated"

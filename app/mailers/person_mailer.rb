@@ -1,7 +1,7 @@
 class PersonMailer < ActionMailer::Base
   default :from => 'CMU-SV Official Communication <help@sv.cmu.edu>',
-          :cc => 'help@sv.cmu.edu',
-          :bcc => "rails.app@sv.cmu.edu",
+          :cc => 'edward.akoto@sv.cmu.edu',
+          :bcc => "",
           :subject => 'Welcome to Carnegie Mellon University Silicon Valley'
 
 

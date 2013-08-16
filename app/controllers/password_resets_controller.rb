@@ -11,6 +11,11 @@ class PasswordResetsController < ApplicationController
     redirect_to edit_password_reset_path
   end
 
+  # Confirm password reset
+  def password_reset_confirmation
+
+  end
+
   # Create new password reset request
   def create
     @user = User.find_by_email(params[:cmu_email])
@@ -56,7 +61,7 @@ class PasswordResetsController < ApplicationController
               PersonMailer.active_directory_password_change_notification(@user).deliver
             end
 
-            # Notify help@sv.cmu.edu
+            # Notify help@sv.cmu.edu success
             options = {:to => "edward.akoto@sv.cmu.edu", :cc => "", :subject => "AD Success: #{@user.email}",
                        :message => "LDAP Success code: Create/Change Password", :url => "", :url_label => ""}
             GenericMailer.email(options).deliver
@@ -65,7 +70,7 @@ class PasswordResetsController < ApplicationController
 
           elsif message.is_a?(String)
 
-            # Alert help@sv.cmu.edu
+            # Alert help@sv.cmu.edu error
             options = {:to => "edward.akoto@sv.cmu.edu", :cc => "", :subject => "AD Error: #{@user.email}",
                        :message => "LDAP Error code: #{message}", :url => "", :url_label => ""}
             GenericMailer.email(options).deliver
@@ -79,7 +84,7 @@ class PasswordResetsController < ApplicationController
 
           else
 
-            # Alert help@sv.cmu.edu
+            # Alert help@sv.cmu.edu error
             options = {:to => "edward.akoto@sv.cmu.edu", :cc => "", :subject => "AD Error: #{@user.email}",
                        :message => "LDAP Error code: Unable to authenticate or bind to Active Directory server.", :url => "", :url_label => ""}
             GenericMailer.email(options).deliver

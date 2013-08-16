@@ -13,7 +13,7 @@ class ActiveDirectory
   # Create an Active Directory account for a user
   # Error out if user's email address is blank or domain is not Google domain
   # If this fails, return an error message as a string, else return void
-  # The return message is "Success", "Unwilling to perform", "Entity exists", "No such object", "Unable to authenticate...", "True"
+  # The return message is "Success", "Unwilling to perform", "Entity exists", "No such object", "Unable to authenticate..."
   def create_account(user)
     return "Empty email address. Edit your profile page" if user.email.blank?
 
@@ -26,13 +26,12 @@ class ActiveDirectory
       @connection.add(:dn => ldap_distinguished_name(user), :attributes => ldap_attributes(user))
 
       message = @connection.get_operation_result.message
-      if message == "Success"
+      if message == "Success" || message == "Entity exists"
         user.active_directory_account_created_at=Time.now()
         user.save
-        return true
-      else
-        return message
       end
+
+      return message
 
     else
       return "Unable to authenticate or bind to Active Directory server."
