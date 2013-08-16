@@ -1,6 +1,3 @@
-<% content_for :title, "Editing " + @person.human_name %>
-
-
 <% content_for :javascript do %>
 
     <%= javascript_tag do %>
@@ -79,6 +76,19 @@
 
 <%= form_for @person, :html => {:multipart => true, :id => "photo-upload-form"},
              :url => people_photo_upload_path(@person) do |f| %>
+
+    <% if @person.errors.any? %>
+        <div id="error_explanation">
+          <h2><%= pluralize(@person.errors.count, "error") %> prohibited this person from being saved:</h2>
+
+          <ul>
+            <% @person.errors.full_messages.each do |msg| %>
+                <li><%= msg %></li>
+            <% end %>
+          </ul>
+        </div>
+    <% end %>
+
     <div id="dialog">
       <div class="photo-profile">
         <div id="photo-custom" class="image-candidates">

@@ -1,5 +1,8 @@
 require 'net/ldap'
 
+# Domain of the Active Directory Server
+AD_DOMAIN = ENV['AD_DOMAIN'] || "ds.sv.cmu.edu"
+
 # This class provides active directory services
 class ActiveDirectory
 
@@ -13,7 +16,7 @@ class ActiveDirectory
   # Create an Active Directory account for a user
   # Error out if user's email address is blank or domain is not Google domain
   # If this fails, return an error message as a string, else return void
-  # The return message is "Success", "Unwilling to perform", "Entity exists", "No such object", "Unable to authenticate..."
+  # The return message is "Success", "Unwilling to perform", "Entry Already Exists", "No such object", "Unable to authenticate...", "True"
   def create_account(user)
     return "Empty email address. Edit your profile page" if user.email.blank?
 
@@ -26,7 +29,7 @@ class ActiveDirectory
       @connection.add(:dn => ldap_distinguished_name(user), :attributes => ldap_attributes(user))
 
       message = @connection.get_operation_result.message
-      if message == "Success" || message == "Entity exists"
+      if message == "Success" || message == "Entry Already Exists"
         user.active_directory_account_created_at=Time.now()
         user.save
       end
@@ -55,9 +58,9 @@ class ActiveDirectory
   def ldap_attributes(user)
     attributes = {
         :cn => user.human_name,
-        :mail => user.email,
+        :mail => format_email_domain(user.email),
         :objectclass => ["top", "person", "organizationalPerson", "user"],
-        :userPrincipalName => user.email,
+        :userPrincipalName => format_email_domain(user.email),
         :unicodePwd => password_encode('Just4now' + Time.now.to_f.to_s[-4, 4]),
         :userAccountControl => "512",
         :sn => user.last_name,
@@ -70,7 +73,13 @@ class ActiveDirectory
   # Build user distinguished name for active directory account
   def ldap_distinguished_name(user)
     distinguished_name = "cn=#{user.human_name},"
-    base_distinguished_name = "dc=ds,dc=sv,dc=cmu,dc=edu"
+    base_distinguished_name = ""
+
+    AD_DOMAIN.split('.').each do |item|
+      base_distinguished_name+="dc=#{item},"
+    end
+
+    base_distinguished_name=base_distinguished_name.chop
 
     if user.is_staff
       distinguished_name += "ou=Staff,ou=Sync,"
@@ -110,4 +119,10 @@ class ActiveDirectory
       return false
     end
   end
+
+  # Format email with correct domain
+  def format_email_domain(email)
+    return "#{email.split('@')[0]}@#{AD_DOMAIN}"
+  end
+
 end

@@ -192,7 +192,12 @@ class PeopleController < ApplicationController
 
   # Confirm password reset
   def confirm_password_reset
+    @person = User.find_by_param(params[:id])
+    @person.set_password_reset_token
+    @strength_themes = StrengthTheme.all
 
+  rescue ActiveRecord::RecordNotFound
+    redirect_to root_url, :flash => { :error => "Invalid user" } and return
   end
 
   #http://localhost:3000/people/new?first_name=Todd&last_name=Sedano&webiso_account=at33@andrew.cmu.edu&is_student=true&program=ECE&expires_at=2013-01-01
@@ -341,8 +346,8 @@ class PeopleController < ApplicationController
             format.html { redirect_to edit_password_reset_path(@person.password_reset_token) }
             format.xml { head :ok }
 
-          elsif message == "Entity exists"
-            redirect_to :action=>"confirm_password_reset", :id=>@person
+          elsif message == "Entry Already Exists"
+            redirect_to :action=>"confirm_password_reset", :id=>@person and return
           else
             flash[:error]="Sorry, this profile update cannot be updated at the moment. Please contact help@sv.cmu.edu."
 

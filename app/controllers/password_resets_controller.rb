@@ -13,7 +13,7 @@ class PasswordResetsController < ApplicationController
 
   # Confirm password reset
   def password_reset_confirmation
-
+     # Display confirmation prompt
   end
 
   # Create new password reset request
@@ -38,6 +38,9 @@ class PasswordResetsController < ApplicationController
   # Display edit form with password reset token link
   def edit
     @user = User.find_by_password_reset_token!(params[:id])
+    if !params[:password_reset_confirmation].nil? && params[:password_reset_confirmation]=="no"
+      redirect_to root_url, :flash => {:notice => "Thank you for verifying your profile! "} and return
+    end
   rescue ActiveRecord::RecordNotFound
     redirect_to new_password_reset_path, :flash => {:error => "Password reset link is invalid."}
   end

@@ -173,10 +173,7 @@ CMUEducation::Application.routes.draw do
   match '/password_resets/:' => 'password_resets#new', :as => :reset
 
   match '/people/new_user/:new_user_token' => 'people#new_user'
-
-
-
-
+  match '/people/confirm_password_reset/:id' => 'people#confirm_password_reset'
 
 end
 
