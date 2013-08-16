@@ -10,7 +10,7 @@ class PeopleController < ApplicationController
 
   ; private(:controller)
 
-  before_filter :authenticate_user!, :except => [:show_by_twiki, :init_account, :update]
+  before_filter :authenticate_user!, :except => [:show_by_twiki, :new_user, :update]
 
 # Floating box source: http://roshanbh.com.np/2008/07/top-floating-message-box-using-jquery.html
 
