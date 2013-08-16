@@ -329,7 +329,10 @@ class PeopleController < ApplicationController
 
     respond_to do |format|
       @person.attributes = params[:user]
-      @person.expires_at = params[:user][:expires_at] if current_user.is_admin?
+
+      if !current_user.nil?
+        @person.expires_at = params[:user][:expires_at] if current_user.is_admin?
+      end
 
       if @person.save
         unless @person.is_profile_valid
