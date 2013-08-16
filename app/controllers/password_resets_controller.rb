@@ -55,27 +55,26 @@ class PasswordResetsController < ApplicationController
               PersonMailer.active_directory_password_change_notification(@user).deliver
             end
             format.html {redirect_to root_url}
+
           elsif message.is_a?(String)
-
             # Alert help@sv.cmu.edu
-            options = {:to => "edward.akoto@sv.cmu.edu", :cc => "", :subject => "Error from #{@user.human_name}",
-                       :message => message, :url => "", :url_label => ""}
+            options = {:to => "test.whiteboard@sv.cmu.edu", :cc => "", :subject => "AD Error: #{@user.email}",
+                       :message => "LDAP Error code: #{message}", :url => "", :url_label => ""}
             GenericMailer.email(options).deliver
 
-            flash[:error]="Password does not meet required minimum complexity. Read instructions below or report to help@sv.cmu.edu."
-            format.html {redirect_to edit_password_reset_path}
+            if message== "Unwilling to perform"
+              flash[:error]="Password does not meet required minimum complexity. Read instructions below or report to help@sv.cmu.edu."
+            else
+              flash[:error]="Sorry your request cannot be completed at the moment. We have notified help@sv.cmu.edu."
+            end
             redirect_to edit_password_reset_path and return
-
           else
-            message = "Cannot contact server. Report this to help@sv.cmu.edu"
-
             # Alert help@sv.cmu.edu
-            options = {:to => "edward.akoto@sv.cmu.edu", :cc => "", :subject => "Error from #{@user.human_name}",
-                       :message => "Server was unreachable at #{Time.now.to_s}", :url => "", :url_label => ""}
+            options = {:to => "test.whiteboard@sv.cmu.edu", :cc => "", :subject => "AD Error: #{@user.email}",
+                       :message => "LDAP Error code: Unable to authenticate or bind to Active Directory server.", :url => "", :url_label => ""}
             GenericMailer.email(options).deliver
 
-            flash[:error] = "Cannot contact server. Report this to help@sv.cmu.edu"
-            format.html {redirect_to edit_password_reset_path}
+            flash[:error] = "Sorry your request cannot be completed at the moment. We have notified help@sv.cmu.edu."
             redirect_to edit_password_reset_path and return
           end
 
@@ -85,7 +84,7 @@ class PasswordResetsController < ApplicationController
         end
       else
         flash[:error] = "Password reset link has expired. You may send a new link."
-        format.html {redirect_to new_password_reset_path}
+        redirect_to redirect_to new_password_reset_path and return
       end
     end
   end
