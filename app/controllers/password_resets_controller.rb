@@ -37,12 +37,13 @@ class PasswordResetsController < ApplicationController
     redirect_to new_password_reset_path, :flash => {:error => "Password reset link is invalid."}
   end
 
-  # Performs actual password reset
+  # Perform actual password reset
   def update
     @user = User.find_by_password_reset_token!(params[:id])
     respond_to do |format|
       if @user && !@user.password_reset_sent_at.nil? && @user.password_reset_sent_at>2.hours.ago # If request was sent within two hours
         @active_directory_services = ActiveDirectory.new
+
         if params[:new_password]
           message = @active_directory_services.reset_password(@user, params[:new_password])
 
@@ -68,6 +69,7 @@ class PasswordResetsController < ApplicationController
               flash[:error]="Sorry your request cannot be completed at the moment. We have notified help@sv.cmu.edu."
             end
             redirect_to edit_password_reset_path and return
+
           else
             # Alert help@sv.cmu.edu
             options = {:to => "edward.akoto@sv.cmu.edu", :cc => "", :subject => "AD Error: #{@user.email}",
