@@ -21,7 +21,7 @@ class PasswordResetsController < ApplicationController
         @active_directory_services.send_password_reset_token(@user)
         redirect_to root_url, :notice => "Password reset instructions have been sent to #{@user.personal_email}"
       else
-        flash[:error] = "Your email entries did not match our records. Please try again or contact help@sv.cmu.edu"
+        flash[:error] = "Your email entries do not match our records. Please try again or contact help@sv.cmu.edu"
         redirect_to new_password_reset_path and return
       end
     else
