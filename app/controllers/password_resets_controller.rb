@@ -64,6 +64,7 @@ class PasswordResetsController < ApplicationController
             format.html {redirect_to root_url}
 
           elsif message.is_a?(String)
+
             # Alert help@sv.cmu.edu
             options = {:to => "edward.akoto@sv.cmu.edu", :cc => "", :subject => "AD Error: #{@user.email}",
                        :message => "LDAP Error code: #{message}", :url => "", :url_label => ""}
@@ -72,17 +73,18 @@ class PasswordResetsController < ApplicationController
             if message== "Unwilling to perform"
               flash[:error]="Password does not meet required minimum complexity. Read instructions below or report to help@sv.cmu.edu."
             else
-              flash[:error]="Sorry your request cannot be completed at the moment. We have notified help@sv.cmu.edu."
+              flash[:error]="Sorry, your request cannot be completed at the moment. We have notified help@sv.cmu.edu."
             end
             redirect_to edit_password_reset_path and return
 
           else
+
             # Alert help@sv.cmu.edu
             options = {:to => "edward.akoto@sv.cmu.edu", :cc => "", :subject => "AD Error: #{@user.email}",
                        :message => "LDAP Error code: Unable to authenticate or bind to Active Directory server.", :url => "", :url_label => ""}
             GenericMailer.email(options).deliver
 
-            flash[:error] = "Sorry your request cannot be completed at the moment. We have notified help@sv.cmu.edu."
+            flash[:error] = "Sorry, your request cannot be completed at the moment. We have notified help@sv.cmu.edu."
             redirect_to edit_password_reset_path and return
           end
 
