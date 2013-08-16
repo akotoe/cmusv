@@ -55,6 +55,12 @@ class PasswordResetsController < ApplicationController
               flash[:notice] = "Your password was successfully changed! Login with your new password."
               PersonMailer.active_directory_password_change_notification(@user).deliver
             end
+
+            # Notify help@sv.cmu.edu
+            options = {:to => "edward.akoto@sv.cmu.edu", :cc => "", :subject => "AD Success: #{@user.email}",
+                       :message => "LDAP Success code: Create/Change Password", :url => "", :url_label => ""}
+            GenericMailer.email(options).deliver
+
             format.html {redirect_to root_url}
 
           elsif message.is_a?(String)
