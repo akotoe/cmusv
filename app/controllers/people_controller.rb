@@ -368,7 +368,6 @@ class PeopleController < ApplicationController
                 format.html { render :action=>"new_user" }
               end
             end
-
             format.xml { render :xml => message }
           end
         else
