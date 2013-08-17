@@ -23,9 +23,9 @@ describe "ActiveDirectory" do
 
   it 'ldap_attributes method returns necessary ldap attributes' do
     @active_directory_services.ldap_attributes(@faculty_frank).should include( :cn=>"Faculty Frank",
-                                                                              :mail=>"faculty.frank@sandbox.sv.cmu.edu",
+                                                                              :mail=>"faculty.frank@ds.sv.cmu.edu",
                                                                               :objectclass=>["top", "person", "organizationalPerson", "user"],
-                                                                              :userPrincipalName=>"faculty.frank@sandbox.sv.cmu.edu")
+                                                                              :userPrincipalName=>"faculty.frank@ds.sv.cmu.edu")
   end
 
   it 'password_encode method encodes password to hexadecimal base 64' do
