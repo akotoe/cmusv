@@ -65,7 +65,7 @@ class PasswordResetsController < ApplicationController
             end
 
             # Notify support team about success
-            SupportMailer.send_success_notification("#{@user.human_name} successfully created or changed his or her password ").deliver
+            SupportMailer.send_success_notification("#{@user.human_name} successfully created or changed his or her whiteboard account password ").deliver
 
             format.html {redirect_to root_url}
 
