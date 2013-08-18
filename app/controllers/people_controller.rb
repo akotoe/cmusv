@@ -354,10 +354,8 @@ class PeopleController < ApplicationController
           else
             flash[:error]="Sorry, this profile update cannot be updated at the moment. Please contact help@sv.cmu.edu."
 
-            # Alert help@sv.cmu.edu error
-            options = {:to => "edward.akoto@sv.cmu.edu", :cc => "", :subject => "AD Error: #{@person.email}",
-                       :message => "LDAP Error code: #{message}", :url => "", :url_label => ""}
-            GenericMailer.email(options).deliver
+            # Notify support team about error
+            SupportMailer.send_failure_notification("#{@user.human_name} experienced an error with message: #{message}").deliver
 
             if current_user.nil?
               format.html { render :action=>"new_user" }
