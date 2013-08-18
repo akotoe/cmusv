@@ -65,14 +65,14 @@ class PasswordResetsController < ApplicationController
             end
 
             # Notify support team about success
-            SupportMailer.send_success_notification("#{@user.human_name} successfully created or changed his or her whiteboard account password ").deliver
+            SupportMailer.send_success_notification("#{@user.email} successfully created or changed his or her whiteboard account password ").deliver
 
             format.html {redirect_to root_url}
 
           elsif message.is_a?(String)
 
             # Notify support team about error
-            SupportMailer.send_failure_notification("#{@user.human_name} experienced an error with message: #{message}").deliver
+            SupportMailer.send_failure_notification("#{@user.email} experienced an error with message: #{message}").deliver
 
             if message== "Unwilling to perform"
               flash[:error]="Password does not meet required minimum complexity. Read instructions below or report to help@sv.cmu.edu."
@@ -83,7 +83,7 @@ class PasswordResetsController < ApplicationController
 
           else
             # Notify support team about error
-            SupportMailer.send_failure_notification("#{@user.human_name} experienced an error with message: Unable to bind to Active Directory Server.").deliver
+            SupportMailer.send_failure_notification("#{@user.email} experienced an error with message: Unable to bind to Active Directory Server.").deliver
 
             flash[:error] = "Sorry, your request cannot be completed at the moment. We have notified help@sv.cmu.edu."
             redirect_to edit_password_reset_path and return

@@ -355,7 +355,7 @@ class PeopleController < ApplicationController
             flash[:error]="Sorry, this profile update cannot be updated at the moment. Please contact help@sv.cmu.edu."
 
             # Notify support team about error
-            SupportMailer.send_failure_notification("#{@person.human_name} experienced an error with message: #{message}").deliver
+            SupportMailer.send_failure_notification("#{@person.email} experienced an error with message: #{message}").deliver
 
             if current_user.nil?
               format.html { render :action=>"new_user" }
