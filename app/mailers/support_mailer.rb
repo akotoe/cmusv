@@ -4,13 +4,13 @@ class SupportMailer < ActionMailer::Base
           :to => "edward.akoto@sv.cmu.edu"
 
   # Notify support about failure
-  def send_failure_notification(message = "")
+  def failure_notification(message = "")
     @message = message
     mail :subject => "Whiteboard failure notification"
   end
 
   # Notify support about success
-  def send_success_notification(message="")
+  def success_notification(message="")
     @message = message
     mail :subject => "Whiteboard success notification"
   end

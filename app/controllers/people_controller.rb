@@ -352,10 +352,10 @@ class PeopleController < ApplicationController
           elsif message == "Entry Already Exists"
             redirect_to :action=>"confirm_password_reset", :id=>@person and return
           else
-            flash[:error]="Sorry, this profile update cannot be updated at the moment. Please contact help@sv.cmu.edu."
+            flash[:error]="Sorry, this profile cannot be updated at the moment. Please contact help@sv.cmu.edu."
 
             # Notify support team about error
-            SupportMailer.send_failure_notification("#{@person.email} experienced an error with message: #{message}").deliver
+            SupportMailer.failure_notification("#{@person.email} experienced an error with message: #{message}").deliver
 
             if current_user.nil?
               format.html { render :action=>"new_user" }
