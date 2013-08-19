@@ -178,6 +178,11 @@ class PeopleController < ApplicationController
   # Use this to allow user to complete his/her account creation process
   def new_user
     @person = User.find_by_new_user_token(params[:id])
+
+    if @person.nil?
+      redirect_to root_url, :flash => { :error => "Account creation link has expired. Please contact help@sv.cmu.edu" } and return
+    end
+
     @strength_themes = StrengthTheme.all
 
     # Block link if active directory is already created
@@ -190,9 +195,6 @@ class PeopleController < ApplicationController
       redirect_to root_url, :flash => { :error => "You do not have permission to access this link." } and return
     end
 
-      # Rescue if link is invalid
-  rescue ActiveRecord::RecordNotFound
-    redirect_to root_url, :flash => { :error => "Account creation link has expired. Please contact help@sv.cmu.edu" } and return
   end
 
   # Confirm password reset
@@ -224,7 +226,7 @@ class PeopleController < ApplicationController
     @person.expires_at = params[:expires_at]
 
     active_directory_service = ActiveDirectory.new
-    @org_units = active_directory_service.organization_units.sort
+    #@org_units = active_directory_service.organization_units.sort
 
     if Rails.env.development?
       @domain = GOOGLE_DOMAIN
@@ -274,8 +276,6 @@ class PeopleController < ApplicationController
       @person.masters_program = params[:masters_program]
     end
     @person.masters_track = params[:se_track] if @person.masters_program!="PhD"
-
-    Rails.logger.info("MASTERS COURSE #{params[:masters_course]}")
 
     respond_to do |format|
       if @person.save
@@ -329,8 +329,7 @@ class PeopleController < ApplicationController
   # PUT /people/1.xml
   def update
     @person = User.find_by_param(params[:id])
-    create_active_directory_account = params[:create_active_directory_account]
-    resend_new_user_token = params[:resend_new_user_token]
+    active_directory_account_operation = params[:active_directory_account_operation]
 
     # authorize! :update, @person
 
@@ -351,7 +350,7 @@ class PeopleController < ApplicationController
           flash[:error] = "Please update or verify your (social handles or biography) and your contact information"
         end
 
-        if create_active_directory_account
+        if active_directory_account_operation == "create_account"
           active_directory_service = ActiveDirectory.new
           message = active_directory_service.create_account(@person)
 
@@ -380,9 +379,14 @@ class PeopleController < ApplicationController
             end
             format.xml { render :xml => message }
           end
-        elsif resend_new_user_token
+        elsif active_directory_account_operation == "send_new_token"
+
+          # Set new user token
+          @person.set_new_user_token
+          @person.save!
           PersonMailer.welcome_email(@person).deliver
-          flash[:notice] = "A new user token has been sent to #{@person.email}"
+
+          flash[:notice] = "A new user token has been sent to #{@person.personal_email}"
           format.html { redirect_to person_path(@person) }
           format.xml { head :ok }
         else

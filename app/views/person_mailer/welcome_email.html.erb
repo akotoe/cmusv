@@ -3,7 +3,7 @@ Hi <%= @person.first_name %>,
 <p>We have initiated an account creation process for your Silicon Valley email. This account is your primary email account for all Silicon Valley academic and administrative communications.</p>
 <p>To complete the account creation process, follow this link:
 http://<%= @host%>/people/new_user/<%= @person.new_user_token %> and fill in your profile information.</p>
-<p>This link will expire in 48hours from <%= Time.now.to_s  %></p>
+<p>This link will expire in 2 hours from <%= Time.now.to_s  %></p>
 <p>If you have any questions regarding your email account or technical resources at Carnegie Mellon Silicon Valley, please email help@sv.cmu.edu.</p>
 
 <p>Regards, </p>
