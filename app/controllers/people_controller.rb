@@ -218,6 +218,9 @@ class PeopleController < ApplicationController
     @person.masters_program = params[:program]
     @person.expires_at = params[:expires_at]
 
+    active_directory_service = ActiveDirectory.new
+    @org_units = active_directory_service.organization_units.sort
+
     if Rails.env.development?
       @domain = GOOGLE_DOMAIN
     else
@@ -271,8 +274,6 @@ class PeopleController < ApplicationController
 
     respond_to do |format|
       if @person.save
-
-
 
         # Send welcome email link if account creation type is staged
         # Else redirect to profile edit page and complete rest of creation process
@@ -340,8 +341,8 @@ class PeopleController < ApplicationController
         end
 
         if @person.active_directory_account_created_at.nil?
-          @active_directory_service = ActiveDirectory.new
-          message = @active_directory_service.create_account(@person)
+          active_directory_service = ActiveDirectory.new
+          message = active_directory_service.create_account(@person)
 
           if message == "Success"
             @person.set_password_reset_token

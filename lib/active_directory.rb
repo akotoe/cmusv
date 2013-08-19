@@ -135,14 +135,13 @@ class ActiveDirectory
   def organization_units
     if self.bind
       filter = Net::LDAP::Filter.eq("objectClass", "organizationalunit")
-      results= @connection.search(:base => base_distinguished_name, :filter => filter)
+      results= @connection.search(:base => "ou=sync,"+base_distinguished_name, :filter => filter)
+      units = []
       results.each do |entry|
-        organization_unit = entry.distinguishedname[0].split(',')[0]
-        Rails.logger.info("HELLO #{organization_unit[3..organization_unit.length]}")
+        units.push(entry.distinguishedname[0])
       end
-      return true
+      return units
     else
-      Rails.logger.info(" NOTHING ")
       return false
     end
   end
