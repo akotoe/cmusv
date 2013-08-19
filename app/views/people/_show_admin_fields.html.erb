@@ -1,21 +1,17 @@
-<% content_for :javascript do %>
+<%=content_for :javascript do %>
     <script type="text/javascript">
-        // Toggle TWiki notification
-        function toggle_twiki_notification(){
-            if( $("#notify_twiki_user").is(':checked')){
-                $("#twiki_account_notification").fadeIn();
-            }else{
-                $("#twiki_account_notification").fadeOut();
-            }
 
+        // Uncheck the send new user token
+        function uncheck_send_new_user_token(){
+            if($("#create_active_directory_account").is(":checked")){
+                $("#resend_new_user_token").prop("checked", false);
+            }
         }
 
-        // Toggle active directory notification
-        function toggle_active_directory_notification(){
-            if( $("#notify_active_directory_user").is(":checked")){
-                $("#active_directory_notification").fadeIn();
-            }else{
-                $("#active_directory_notification").fadeOut();
+        // Uncheck create active directory account
+        function uncheck_create_active_directory_account(){
+            if ($("#resend_new_user_token").is(":checked")) {
+                $("#create_active_directory_account").prop("checked", false);
             }
         }
     </script>
@@ -57,23 +53,7 @@
         </tr>
         <tr>
             <td><%= f.label :twiki_name, "TWiki name" %></td>
-            <td>
-
-              <%= f.text_field :twiki_name, :placeholder => "TWiki name" %>
-              <%= check_box_tag 'create_twiki_account', 1, false, :disabled=>person.twiki_created %>
-              <%= f.label 'Create' %>
-              <%= check_box_tag 'disable_twiki_account', 1, false%>
-              <%= f.label 'Disable' %>
-              <%= check_box_tag("notify_twiki_user", 1, false, :onchange=>"toggle_twiki_notification()")%>
-              <%= f.label 'Notify' %><br/>
-              <p>
-              <div id='twiki_account_notification' hidden="true">
-                <%= text_area(:notification, :message, :cols => 43, :rows => 3, :placeholder=>'Type notification') %>
-              </div>
-              </p>
-
-
-            </td>
+            <td><%= f.text_field :twiki_name, :placeholder => "Twiki name" %></td>
         </tr>
         <tr>
             <td><%= f.label "Display name" %></td>
@@ -145,19 +125,14 @@
             <td><%= f.check_box :is_ga_promised %></td>
         </tr>
         <tr>
-          <td>Active Directory Account</td>
+          <td>Active Directory</td>
             <td>
-              <%= check_box_tag 'create_active_directory_account', 1, person.active_directory_account_created_at.nil?, :disabled=>!person.active_directory_account_created_at.nil? %>
-              <%= f.label 'Create' %>
-              <%= check_box_tag 'suspend_active_directory_account', 1, false%>
-              <%= f.label 'Disable' %>
-              <%= check_box_tag("notify_active_directory_user", 1, false, :onchange=>"toggle_active_directory_notification()")%>
-              <%= f.label 'Notify' %><br/>
-              <p>
-              <div id='active_directory_notification' hidden="true">
-                <%= text_area(:notification, :message, :cols => 43, :rows => 3, :placeholder=>'Type notification') %>
-              </div>
-              </p>
+              <%= check_box_tag 'create_active_directory_account', 1, false, :disabled=>!person.active_directory_account_created_at.nil?, :onchange=>"uncheck_send_new_user_token()" %>
+              <%= f.label 'Create' %> <br/>
+              <%= check_box_tag 'disable_active_directory_account', 1, false, :disabled=>person.active_directory_account_created_at.nil?%>
+              <%= f.label 'Disable' %> <br/>
+              <%= check_box_tag 'resend_new_user_token', 1, false, :disabled=>!person.active_directory_account_created_at.nil?, :onchange=>"uncheck_create_active_directory_account()" %>
+              <%= f.label 'Resend new user token' %> <br/>
             </td>
         </tr>
         <% end %>
