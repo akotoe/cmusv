@@ -185,7 +185,12 @@ class PeopleController < ApplicationController
       redirect_to root_url, :flash => { :error => "Account creation link has expired. Please contact help@sv.cmu.edu" } and return
     end
 
-      # Rescue if link is invalid
+    # Only guest user or admin can access the new_user link
+    if !current_user.nil? && !current_user.is_admin?
+      redirect_to root_url, :flash => { :error => "You do not have permission to access this link." } and return
+    end
+
+  # Rescue if link is invalid
   rescue ActiveRecord::RecordNotFound
     redirect_to root_url, :flash => { :error => "Account creation link has expired. Please contact help@sv.cmu.edu" } and return
   end
