@@ -280,6 +280,9 @@ class PeopleController < ApplicationController
     respond_to do |format|
       if @person.save
 
+        create_twiki_account = params[:create_twiki_account]
+        Delayed::Job.enqueue(PersonJob.new(@person.id, create_twiki_account, )) unless create_twiki_account.nil?
+
         # Send welcome email link if account creation type is staged
         # Else redirect to profile edit page and complete rest of creation process
         if params[:account_creation_process_type]=="staged"
