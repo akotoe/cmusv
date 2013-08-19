@@ -8,9 +8,13 @@ class ActiveDirectory
 
   # Initialize connection to active directory
   def initialize
+    # Establish connection
     @connection = Net::LDAP.new(:host => LDAPConfig.host, :port => LDAPConfig.port)
     @connection.encryption(:method => :simple_tls) unless !LDAPConfig.is_encrypted?
     @connection.auth LDAPConfig.username, LDAPConfig.password unless LDAPConfig.username.nil? || LDAPConfig.password.nil?
+
+    # Get organization units
+    organization_units
   end
 
   # Create an Active Directory account for a user
@@ -73,13 +77,6 @@ class ActiveDirectory
   # Build user distinguished name for active directory account
   def ldap_distinguished_name(user)
     distinguished_name = "cn=#{user.human_name},"
-    base_distinguished_name = ""
-
-    AD_DOMAIN.split('.').each do |item|
-      base_distinguished_name+="dc=#{item},"
-    end
-
-    base_distinguished_name=base_distinguished_name.chop
 
     if user.is_staff
       distinguished_name += "ou=Staff,ou=Sync,"
@@ -91,6 +88,15 @@ class ActiveDirectory
 
     distinguished_name += base_distinguished_name
     return distinguished_name
+  end
+
+  # Create base distinguished name from the active directory domain name
+  def base_distinguished_name
+    base_name = ""
+    AD_DOMAIN.split('.').each do |item|
+      base_name+="dc=#{item},"
+    end
+    base_name.chop
   end
 
   # Convert password to unicode format
@@ -125,4 +131,19 @@ class ActiveDirectory
     return "#{email.split('@')[0]}@#{AD_DOMAIN}"
   end
 
+  # Return organization units
+  def organization_units
+    if self.bind
+      filter = Net::LDAP::Filter.eq("objectClass", "organizationalunit")
+      results= @connection.search(:base => base_distinguished_name, :filter => filter)
+      results.each do |entry|
+        organization_unit = entry.distinguishedname[0].split(',')[0]
+        Rails.logger.info("HELLO #{organization_unit[3..organization_unit.length]}")
+      end
+      return true
+    else
+      Rails.logger.info(" NOTHING ")
+      return false
+    end
+  end
 end
