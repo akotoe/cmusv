@@ -12,9 +12,6 @@ class ActiveDirectory
     @connection = Net::LDAP.new(:host => LDAPConfig.host, :port => LDAPConfig.port)
     @connection.encryption(:method => :simple_tls) unless !LDAPConfig.is_encrypted?
     @connection.auth LDAPConfig.username, LDAPConfig.password unless LDAPConfig.username.nil? || LDAPConfig.password.nil?
-
-    # Get organization units
-    organization_units
   end
 
   # Create an Active Directory account for a user
@@ -25,7 +22,7 @@ class ActiveDirectory
     return "Empty email address. Edit your profile page" if user.email.blank?
 
     domain = user.email.split('@')[1]
-    if domain != GOOGLE_DOMAIN
+    if domain.nil? || domain!= GOOGLE_DOMAIN
       return "Domain (" + domain + ") is not the same as the google domain (" + GOOGLE_DOMAIN + ")"
     end
 
@@ -80,7 +77,7 @@ class ActiveDirectory
 
     if user.is_staff
       distinguished_name += "ou=Staff,ou=Sync,"
-    elsif !user.masters_program.blank?
+    elsif !user.masters_program.blank? && organization_units("names").include?(user.masters_program)
       distinguished_name += "ou=" + user.masters_program + ",ou=Student,ou=Sync,"
     else
       distinguished_name += "ou=Sync,"
@@ -132,13 +129,22 @@ class ActiveDirectory
   end
 
   # Return organization units
-  def organization_units
+  def organization_units(format="")
     if self.bind
       filter = Net::LDAP::Filter.eq("objectClass", "organizationalunit")
       results= @connection.search(:base => "ou=sync,"+base_distinguished_name, :filter => filter)
       units = []
-      results.each do |entry|
-        units.push(entry.distinguishedname[0])
+
+      # Return organization unit names or distinguished names
+      if format == "names"
+        results.each do |entry|
+          name = entry.distinguishedname[0].split(',')[0]
+          units.push(name[3..name.length])
+        end
+      else
+        results.each do |entry|
+          units.push(entry.distinguishedname[0])
+        end
       end
       return units
     else

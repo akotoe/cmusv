@@ -179,7 +179,7 @@ class PeopleController < ApplicationController
   def new_user
     @person = User.find_by_new_user_token(params[:id])
 
-    if @person.nil?
+    if @person.nil? || @person.new_user_token_sent_at<2.hours.ago
       redirect_to root_url, :flash => { :error => "Account creation link has expired. Please contact help@sv.cmu.edu" } and return
     end
 
@@ -226,7 +226,7 @@ class PeopleController < ApplicationController
     @person.expires_at = params[:expires_at]
 
     active_directory_service = ActiveDirectory.new
-    #@org_units = active_directory_service.organization_units.sort
+    @org_units = active_directory_service.organization_units("names").sort
 
     if Rails.env.development?
       @domain = GOOGLE_DOMAIN
@@ -290,6 +290,7 @@ class PeopleController < ApplicationController
           flash[:notice] = 'Account has been staged for creation. To complete the account creation process, an email has been sent to '+@person.personal_email+"."
           format.html { redirect_to(@person)  }
         else
+          flash[:notice]= "To complete account setup, select 'Create account' in the active directory section below and click update."
           format.html { redirect_to edit_person_path(@person) }
         end
         format.xml { render :xml => @person, :status => :created, :location => @person }
@@ -383,6 +384,7 @@ class PeopleController < ApplicationController
 
           # Set new user token
           @person.set_new_user_token
+          @person.new_user_token_sent_at = Time.now
           @person.save!
           PersonMailer.welcome_email(@person).deliver
 
