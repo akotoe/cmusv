@@ -1,7 +1,7 @@
 require 'net/ldap'
 
 # Domain of the Active Directory Server
-AD_DOMAIN = ENV['AD_DOMAIN'] || "ds.sv.cmu.edu"
+AD_DOMAIN = ENV['AD_DOMAIN'] || "sandbox.sv.cmu.edu"
 
 # This class provides active directory services
 class ActiveDirectory
