@@ -168,12 +168,13 @@ CMUEducation::Application.routes.draw do
   match '/config' => 'welcome#configuration', :as => :config
   match '/' => 'welcome#index', :as => :root
 
-  # password reset pages
+  # password reset and new_user pages
   match '/password_resets' => 'password_resets#new', :as => :reset
   match '/password_resets/:' => 'password_resets#new', :as => :reset
+  match '/people/confirm_password_reset/:id' => 'people#confirm_password_reset'
 
   match '/people/new_user/:new_user_token' => 'people#new_user'
-  match '/people/confirm_password_reset/:id' => 'people#confirm_password_reset'
+
 
 end
 

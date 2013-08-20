@@ -24,8 +24,8 @@ CMUEducation::Application.configure do
   # Only use best-standards-support built into browsers
   config.action_dispatch.best_standards_support = :builtin
 
-  # No need to deliver mails
   ActionMailer::Base.perform_deliveries = false
+  # ActionMailer::Base.perform_deliveries = true
 
   # This is the host url for the token links in the emails we send to users
   config.action_mailer.default_url_options = {
@@ -33,13 +33,13 @@ CMUEducation::Application.configure do
   }
 
   ActionMailer::Base.smtp_settings = {
-    #:address => "smtp.gmail.com",
-    #:port => 587,
-    #:authentication => :plain,
-    #:domain => ENV['GMAIL_SMTP_USER'],
-    #:user_name => ENV['GMAIL_SMTP_USER'],
-    #:password => ENV['GMAIL_SMTP_PASSWORD'],
-    #:enable_starttls_auto => true
+      :address => "smtp.gmail.com",
+      :port => 587,
+      :authentication => :plain,
+      :domain => ENV['GMAIL_SMTP_USER'],
+      :user_name => ENV['GMAIL_SMTP_USER'],
+      :password => ENV['GMAIL_SMTP_PASSWORD'],
+      :enable_starttls_auto => true
   }
 end
 

@@ -12,12 +12,12 @@ class PersonJob < Struct.new(:person_id, :create_twiki_account)
     end
 
     if(!error_message.blank?)
-      Delayed::Worker.logger.debug(error_message)
+      #Delayed::Worker.logger.debug(error_message)
       puts error_message
       message = error_message
       GenericMailer.email(
-          :to => ["edward.akoto@sv.cmu.edu", "albert.liu@sv.cmu.edu"],
-          :from => "test.whiteboard@sv.cmu.edu",
+          :to => ["help@sv.cmu.edu", "todd.sedano@sv.cmu.edu"],
+          :from => "help@sv.cmu.edu",
           :subject => "PersonJob had an error on person id = #{person.id}",
           :message => message,
           :url_label => "Show which person",

@@ -35,15 +35,6 @@ def switch_west_to_sv(email_address)
   return email_address
 end
 
-def switch_sv_to_ad(email_address)
-  return nil if email_address.nil?
-  (name, domain) = email_address.split('@')
-  if(domain == "sv.cmu.edu")
-    email_address = name + "@ad.sv.cmu.edu"
-  end
-  return email_address
-end
-
 def pretty_print_google_error(e)
   logger.debug "errorcode = " +e.code + "input : " + e.input + "reason : "+e.reason
   return "Mailing list already exists." if e.code.to_i == 1300

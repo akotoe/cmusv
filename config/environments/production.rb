@@ -33,20 +33,12 @@ CMUEducation::Application.configure do
 
   # Enable serving of images, stylesheets, and javascripts from an asset server
   # config.action_controller.asset_host = "http://assets.example.com"
-  # config.action_controller.asset_host = "http://cmusv-rails-production.s3.amazonaws.com"
-  # config.action_controller.asset_host = "http://assets0.whiteboard.sv.cmu.edu"
-  # config.action_controller.asset_host = "http://assets%d.whiteboard.sv.cmu.edu"
+  config.action_controller.asset_host = "http://cmusv-rails-production.s3.amazonaws.com"
+  #config.action_controller.asset_host = "http://assets0.whiteboard.sv.cmu.edu"
+  #config.action_controller.asset_host = "http://assets%d.whiteboard.sv.cmu.edu"
 
   # Disable delivery errors, bad email addresses will be ignored
   # config.action_mailer.raise_delivery_errors = false
-
-  # Perform email deliveries
-  ActionMailer::Base.perform_deliveries = true
-
-  # This is the host url for the token links in the emails we send to users
-  config.action_mailer.default_url_options = {
-      :host => ENV['HOST_NAME'] || "localhost:3000"
-  }
 
   # Enable threaded mode
   # config.threadsafe!
@@ -59,21 +51,11 @@ CMUEducation::Application.configure do
   config.active_support.deprecation = :notify
 
   config.middleware.use ExceptionNotifier,
-    :email_prefix => "[ERROR] ",
-    :sender_address => %{"Exception" <support@example.com>},
-    :exception_recipients => %w(edward.akoto@sv.cmu.edu),
-    :sections => %w{cmusv} + ExceptionNotifier::Notifier.default_sections
+                        :email_prefix => "[ERROR] ",
+                        :sender_address => %{"Exception" <support@example.com>},
+                        :exception_recipients => %w(todd.sedano@sv.cmu.edu, kaushik.gopal@sv.cmu.edu),
+                        :sections => %w{cmusv} + ExceptionNotifier::Notifier.default_sections
 
   config.middleware.use("Rack::GoogleAnalytics", :web_property_id => "UA-8300440-2")
-
-  ActionMailer::Base.smtp_settings = {
-      :address        => 'smtp.sendgrid.net',
-      :port           => '587',
-      :authentication => :plain,
-      :user_name      => ENV['SENDGRID_USERNAME'],
-      :password       => ENV['SENDGRID_PASSWORD'],
-      :domain         => 'heroku.com',
-      :enable_starttls_auto => true
-  }
 
 end

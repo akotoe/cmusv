@@ -179,6 +179,7 @@ class PeopleController < ApplicationController
   def new_user
     @person = User.find_by_new_user_token(params[:id])
 
+    # Block link if link is older than 2 hours
     if @person.nil? || @person.new_user_token_sent_at<2.hours.ago
       redirect_to root_url, :flash => { :error => "Account creation link has expired. Please contact help@sv.cmu.edu" } and return
     end
@@ -190,21 +191,20 @@ class PeopleController < ApplicationController
       redirect_to root_url, :flash => { :error => "Account creation link has expired. Please contact help@sv.cmu.edu" } and return
     end
 
-    # Only guest user or admin can access the new_user link
+    # Only guest user or administrator can access the new_user link
     if !current_user.nil? && !current_user.is_admin?
       redirect_to root_url, :flash => { :error => "You do not have permission to access this link." } and return
     end
-
   end
 
   # Confirm password reset
   def confirm_password_reset
     @person = User.find_by_param(params[:id])
+    if @person.nil?
+      redirect_to root_url, :flash => { :error => "Invalid user" } and return
+    end
     @person.set_password_reset_token
     @strength_themes = StrengthTheme.all
-
-  rescue ActiveRecord::RecordNotFound
-    redirect_to root_url, :flash => { :error => "Invalid user" } and return
   end
 
   #http://localhost:3000/people/new?first_name=Todd&last_name=Sedano&webiso_account=at33@andrew.cmu.edu&is_student=true&program=ECE&expires_at=2013-01-01
@@ -225,9 +225,6 @@ class PeopleController < ApplicationController
     @person.masters_program = params[:program]
     @person.expires_at = params[:expires_at]
 
-    active_directory_service = ActiveDirectory.new
-    @org_units = active_directory_service.organization_units("names").sort
-
     if Rails.env.development?
       @domain = GOOGLE_DOMAIN
     else
@@ -235,7 +232,6 @@ class PeopleController < ApplicationController
     end
 
     @strength_themes = StrengthTheme.all
-
 
     respond_to do |format|
       format.html # new.html.erb
@@ -251,7 +247,6 @@ class PeopleController < ApplicationController
       redirect_to user_path(@person)
     end
 #    authorize! :update, @person
-
     @strength_themes = StrengthTheme.all
   end
 

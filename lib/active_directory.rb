@@ -28,13 +28,11 @@ class ActiveDirectory
 
     if self.bind
       @connection.add(:dn => ldap_distinguished_name(user), :attributes => ldap_attributes(user))
-
       message = @connection.get_operation_result.message
       if message == "Success" || message == "Entry Already Exists"
-        user.active_directory_account_created_at=Time.now()
+        user.active_directory_account_created_at = Time.now()
         user.save
       end
-
       return message
 
     else
@@ -132,7 +130,7 @@ class ActiveDirectory
   def organization_units(format="")
     if self.bind
       filter = Net::LDAP::Filter.eq("objectClass", "organizationalunit")
-      results= @connection.search(:base => "ou=sync,"+base_distinguished_name, :filter => filter)
+      results = @connection.search(:base => "ou=sync,"+base_distinguished_name, :filter => filter)
       units = []
 
       # Return organization unit names or distinguished names
@@ -147,6 +145,7 @@ class ActiveDirectory
         end
       end
       return units
+
     else
       return false
     end
