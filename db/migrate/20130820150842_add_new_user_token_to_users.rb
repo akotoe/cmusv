@@ -16,7 +16,7 @@ class AddNewUserTokenToUsers < ActiveRecord::Migration
     #remove_column :user_versions, :password_reset_sent_at
     #remove_column :user_versions, :password_reset_token
     #remove_column :users, :new_user_token
-    remove_column :users, :new_user_token_sent_at
+    #remove_column :users, :new_user_token_sent_at
     #remove_column :users, :password_reset_sent_at
     #remove_column :users, :password_reset_token
   end
