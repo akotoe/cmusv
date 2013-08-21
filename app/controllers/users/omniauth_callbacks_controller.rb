@@ -18,10 +18,10 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
 
     if @user
       remember_me(@user)
-      flash[:notice] = I18n.t "devise.omniauth_callbacks.success", :kind => omniauth['provider'], :email => email
+      flash[:notice] = I18n.t "devise.omniauth_callbacks.success", :kind => omniauth['provider'], :email => switch_sv_to_ad(email)
       sign_in_and_redirect @user, :event => :authentication
     else
-      flash[:error] = "Sorry, no user with this email (#{email}) exists in the system. help@sv.cmu.edu was just notified of this issue."
+      flash[:error] = "Sorry, no user with this email (#{switch_sv_to_ad(email)}) exists in the system. help@sv.cmu.edu was just notified of this issue."
       options = {:to => "help@sv.cmu.edu",
                  :from => "help@sv.cmu.edu",
                  :subject => "Login problem to on whiteboard.sv.cmu.edu for user #{email}",
