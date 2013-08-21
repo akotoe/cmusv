@@ -35,6 +35,15 @@ def switch_west_to_sv(email_address)
   return email_address
 end
 
+def switch_ad_to_sv(email_address)
+  return nil if email_address.nil?
+  (name, domain) = email_address.split('@')
+  if(domain == "ad.sv.cmu.edu")
+    email_address = name + "@sv.cmu.edu"
+  end
+  return email_address
+end
+
 def switch_sv_to_ad(email_address)
   return nil if email_address.nil?
   (name, domain) = email_address.split('@')

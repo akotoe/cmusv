@@ -14,7 +14,7 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
     @user = User.find_for_google_apps_oauth(env["omniauth.auth"], current_user)
 
     omniauth = env["omniauth.auth"]
-    email = switch_west_to_sv(omniauth["info"]["email"])
+    email = switch_ad_to_sv(omniauth["info"]["email"])
 
     if @user
       remember_me(@user)
