@@ -226,7 +226,6 @@ class PeopleController < ApplicationController
     @person.expires_at = params[:expires_at]
 
     active_directory_service = ActiveDirectory.new
-    @org_units = active_directory_service.organization_units("names").sort
 
     if Rails.env.development?
       @domain = GOOGLE_DOMAIN
