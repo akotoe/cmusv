@@ -15,9 +15,6 @@
         check_email();
         check_webiso_account();
         update_graduation_year();
-        toggle_student_user_attributes();
-        toggle_masters_phd_program();
-        toggle_SE_tracks();
         });
     <% end %>
 
@@ -122,53 +119,19 @@
             add_loader(node, 'Checking account...');
         }
 
-        // Update the graduation year of a student
+        // Updates the graduation year of a student
         function update_graduation_year() {
             now = new Date;
             offset = 1;
-            if ($("#user_is_part_time").is(':checked')) {
+            if (document.forms["new_user"].user_is_part_time.checked == true) {
                 offset = 2
             }
-            if ($("#user_is_student").is(':checked')) {
-                $("#graduation_year option").filter(function() {
-                    return $(this).text() == now.getFullYear() + offset;
-                }).prop('selected', true);
-
+            if (document.forms["new_user"].user_is_student.checked == true) {
+                document.forms["new_user"].user_graduation_year.value = (now.getFullYear() + offset);
             } else {
-                $("#graduation_year option").filter(function() {
-                    return $(this).text() == now.getFullYear()+1;
-                }).prop('selected', true);
+                document.forms["new_user"].user_graduation_year.value = "";
             }
-        }
 
-        // Toggle student user attributes
-         function toggle_student_user_attributes(){
-             if($("#user_is_student").is(":checked")){
-                  $("#student_user_attributes").fadeIn();
-             } else{
-                  $("#student_user_attributes").fadeOut();
-             }
-         }
-
-        // Toggle masters and phd programs
-         function toggle_masters_phd_program(){
-             if($("#graduate_program").val()=="MS"){
-                 $("#masters_programs").fadeIn();
-                 $("#phd_courses").hide();
-             }else if($("#graduate_program").val()=="PhD"){
-                 $("#masters_programs").hide();
-                 $("#SE_tracks").hide();
-                 $("#phd_courses").fadeIn();
-             }
-         }
-
-        // Toggle student SE courses
-        function toggle_SE_tracks(){
-            if($("#masters_program").val()=="SE"){
-                $("#SE_tracks").fadeIn();
-            }else{
-                $("#SE_tracks").fadeOut();
-            }
         }
     </script>
 
@@ -187,106 +150,92 @@
         </div>
     <% end %>
     <%= field_set_tag nil, :class=>'cmu_table', do %>
-    <p>
-      <%= f.label :first_name, "Preferred first name" %><br/>
-      <%= f.text_field :first_name, :onblur => "update_twiki_and_email()" %>
-    </p>
-    <p>
-      <%= f.label :legal_first_name %><br/>
-      <%= f.text_field :legal_first_name %><br/>
-      <span class="help_text">(Ok to leave blank)</span>
-    </p>
-    <p>
-      <%= f.label :last_name %><br/>
-      <%= f.text_field :last_name, :onblur => "update_twiki_and_email()" %>
-    </p>
+        <p>
+          <%= f.label :first_name, "Preferred first name" %><br/>
+          <%= f.text_field :first_name, :onblur => "update_twiki_and_email()" %>
+        </p>
+        <p>
+          <%= f.label :legal_first_name %><br/>
+          <%= f.text_field :legal_first_name %><br/>
+          <span class="help_text">(Ok to leave blank)</span>
+        </p>
+        <p>
+          <%= f.label :last_name %><br/>
+          <%= f.text_field :last_name, :onblur => "update_twiki_and_email()" %>
+        </p>
 
-    <!--
-    <% if Rails.env.development? %>
+        <!--
+        <% if Rails.env.development? %>
   <p>
   <%# f.label :password, f.object.new_record? ? nil : "Change password" %><br />
   <%# f.password_field :password %><br />
     <span class="help_text">(This field only appears in development for local login testing without a network)</span>
   </p>
   <% end %>
-    -->
+        -->
 
-    <p>
-      <%= f.label :twiki_name %><br/>
-      <%= f.text_field :twiki_name %>
-      <%= check_box_tag("create_twiki_account", 1, false) %> Create twiki account?
-    </p>
-    <p>
-      <%= f.label :email %><br/>
-      <%= f.text_field :email, :onblur => "check_email()" %>
-      <!-- We will be creating google app accounts through Active Directory
+        <p>
+          <%= f.label :twiki_name %><br/>
+          <%= f.text_field :twiki_name %>
+          <%= check_box_tag("create_twiki_account", 1, false) %> Create twiki account?
+        </p>
+        <p>
+          <%= f.label :email %><br/>
+          <%= f.text_field :email, :onblur => "check_email()" %>
+          <!-- We will be creating google app accounts through Active Directory
       <%#= check_box_tag("create_google_email", 1, true) %> Create google email account? -->
-      <div id="email_warning"></div>
-    </p>
-    <p>
-      <%= f.label :webiso_account, "Andrew account" %><br/>
-      <%= f.text_field :webiso_account, :onblur => "check_webiso_account()", :placeholder => "@andrew.cmu.edu" %>
-      <div id="webiso_account_warning"></div>
-    </p>
-    <p>
-      <%= f.label :personal_email %><br/>
-      <%= f.text_field :personal_email %>
-      <span class="help_text">(Necessary for google email account creation)</span>
-    </p>
+        <div id="email_warning"></div>
+        </p>
+        <p>
+          <%= f.label :webiso_account, "Andrew account" %><br/>
+          <%= f.text_field :webiso_account, :onblur => "check_webiso_account()", :placeholder => "@andrew.cmu.edu" %>
+        <div id="webiso_account_warning"></div>
+        </p>
+        <p>
+          <%= f.label :personal_email %><br/>
+          <%= f.text_field :personal_email %>
+          <span class="help_text">(Necessary for google email account creation)</span>
+        </p>
     <% end %>
 
     <h2>System Roles</h2>
     <%= field_set_tag nil, :class=>'cmu_table', do %>
         <p>
-          <%= f.check_box :is_staff %>
           <%= f.label :is_staff, "Is staff or faculty?" %><br/>
+          <%= f.check_box :is_staff %>
         </p>
         <p>
-          <%= f.check_box :is_student, :onchange => "toggle_student_user_attributes()" %>
           <%= f.label :is_student, "Is a student?" %><br/>
+          <%= f.check_box :is_student, :onchange => "update_graduation_year()" %>
         </p>
         <p>
-          <%= f.check_box :is_active %>
           <%= f.label :is_active, "Is active? - a current user?" %><br/>
+          <%= f.check_box :is_active %>
         </p>
     <% end %>
 
 
-    <div id="student_user_attributes" hidden>
-    <h2>Student Options</h2>
+    <h2>Just for students</h2>
     <%= field_set_tag nil, :class=>'cmu_table', do %>
         <p>
-          <%= f.check_box :is_part_time, :onchange => "update_graduation_year()"%>
-          <%= f.label :is_part_time, "Is part time student?" %> <br/>
+          <%= f.check_box :is_part_time, :onchange => "update_graduation_year()" %>
+          <%= f.label :is_part_time, "Is part time student?" %>
         </p>
         <p>
-         <%= select_tag :graduation_year, options_for_select((Time.now.year..Time.now.year+5).to_a), :selected=>Time.now.year+1, :style => "width:70px" %>  Graduation year
+          <%= f.label :graduation_year %><br/>
+          <%= f.text_field :graduation_year %>
         </p>
         <p>
-          <%= select_tag :graduate_program, options_for_select(["MS","PhD"]), :style => "width:70px", :onchange=>"toggle_masters_phd_program()" %> Graduate program
+          Graduate program<br/>
+          <%= f.text_field :masters_program %><br/>
+          <span class="help_text">SE SM INI PhD</span>
         </p>
-
-        <div id="masters_programs">
-          <p>
-            <%= select_tag :masters_program, options_for_select(["ECE","INI", "SE", "SM"]), :style => "width:70px", :onchange=>"toggle_SE_tracks()" %> Masters course
-          </p>
-        </div>
-
-
-        <div id="SE_tracks" hidden>
-          <p>
-            <%= select_tag :se_track, options_for_select(["Tech","DM"]), :style => "width:70px" %> SE course track
-          </p>
-        </div>
-
-        <div id="phd_courses" hidden>
-          <p>
-            <%= select_tag :phd_track, options_for_select(["ECE"]), :style => "width:70px" %> Graduate track
-          </p>
-        </div>
-
-      <% end %>
-    </div>
+        <p>
+          Graduate track <br/>
+          <%= f.text_field :masters_track %><br/>
+          <span class="help_text">Tech DM IS MOB SM</span>
+        </p>
+    <% end %>
 
     <h2>Account Termination</h2>
     <%= field_set_tag nil, :class=>'cmu_table', do %>
@@ -317,3 +266,4 @@
 <% end %>
 
 <%= link_to 'Back', people_path %>
+

@@ -28,13 +28,11 @@ class ActiveDirectory
 
     if self.bind
       @connection.add(:dn => ldap_distinguished_name(user), :attributes => ldap_attributes(user))
-
       message = @connection.get_operation_result.message
       if message == "Success" || message == "Entry Already Exists"
-        user.active_directory_account_created_at=Time.now()
+        user.active_directory_account_created_at = Time.now()
         user.save
       end
-
       return message
 
     else
@@ -76,14 +74,20 @@ class ActiveDirectory
     distinguished_name = "cn=#{user.human_name},"
 
     if user.is_staff
-      distinguished_name += "ou=Staff,ou=Sync,"
-    elsif !user.masters_program.blank? && organization_units("names").include?(user.masters_program)
-      distinguished_name += "ou=" + user.masters_program + ",ou=Student,ou=Sync,"
-    else
-      distinguished_name += "ou=Sync,"
+      if !user.masters_program.blank? && organization_units("names","staff").include?(user.masters_program)
+        distinguished_name += "ou=" + user.masters_program + ",ou=Student,"
+      else
+        distinguished_name += "ou=Staff,"
+      end
+    elsif user.is_student
+      if !user.masters_program.blank? && organization_units("names","student").include?(user.masters_program)
+        distinguished_name += "ou=" + user.masters_program + ",ou=Student,"
+      else
+        distinguished_name += "ou=Student,"
+      end
     end
 
-    distinguished_name += base_distinguished_name
+    distinguished_name +="ou=Sync,"+base_distinguished_name
     return distinguished_name
   end
 
@@ -129,10 +133,17 @@ class ActiveDirectory
   end
 
   # Return organization units
-  def organization_units(format="")
+  def organization_units(format="", sub_org="")
     if self.bind
+
+      @sub_org = ""
+
+      if !sub_org.blank?
+        @sub_org = "ou=#{sub_org},"
+      end
+
       filter = Net::LDAP::Filter.eq("objectClass", "organizationalunit")
-      results= @connection.search(:base => "ou=sync,"+base_distinguished_name, :filter => filter)
+      results = @connection.search(:base =>@sub_org+"ou=Sync,"+base_distinguished_name, :filter => filter)
       units = []
 
       # Return organization unit names or distinguished names
@@ -147,8 +158,10 @@ class ActiveDirectory
         end
       end
       return units
+
     else
       return false
     end
   end
 end
+

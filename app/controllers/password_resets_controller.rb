@@ -1,19 +1,19 @@
 class PasswordResetsController < ApplicationController
   layout 'cmu_sv'
 
-  # Display new password reset page
+  # Show new password reset page
   def index
     redirect_to new_password_reset_path
   end
 
-  # Display edit password page
+  # Show edit password page
   def show
     redirect_to edit_password_reset_path
   end
 
   # Confirm password reset
   def password_reset_confirmation
-     # Display confirmation prompt
+    # Show confirmation prompt
   end
 
   # Create new password reset request
@@ -99,3 +99,4 @@ class PasswordResetsController < ApplicationController
     end
   end
 end
+

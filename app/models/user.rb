@@ -127,7 +127,7 @@ class User < ActiveRecord::Base
 
   def self.find_for_google_apps_oauth(access_token, signed_in_resource=nil)
     data = access_token['info']
-    email = switch_ad_to_sv(data["email"]).downcase
+    email = switch_west_to_sv(data["email"]).downcase
     User.find_by_email(email)
   end
 
@@ -354,8 +354,8 @@ class User < ActiveRecord::Base
   #  return true
   #end
 
-# attribute :github
-# If the user has not set this attribute, then ask the user to do so
+  # attribute :github
+  # If the user has not set this attribute, then ask the user to do so
   def notify_about_missing_field(attribute, message)
     if self.send(attribute).blank?
       options = {:to => self.email,
@@ -447,3 +447,4 @@ class User < ActiveRecord::Base
 
 
 end
+
