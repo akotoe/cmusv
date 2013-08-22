@@ -180,7 +180,7 @@ class PeopleController < ApplicationController
     @person = User.find_by_new_user_token(params[:id])
 
     # Block link if link is older than 2 hours
-    if @person.nil? || @person.new_user_token_sent_at<2.hours.ago
+    if @person.nil? || @person.new_user_token_sent_at.blank? || @person.new_user_token_sent_at<2.hours.ago
       redirect_to root_url, :flash => { :error => "Account creation link has expired. Please contact help@sv.cmu.edu" } and return
     end
 
@@ -262,15 +262,6 @@ class PeopleController < ApplicationController
     @person.image_uri_second = "/images/mascot.jpg"
     @person.image_uri_custom = "/images/mascot.jpg"
     @person.photo_selection = "first"
-
-    # I added this code to convert organization units to match the current database setup
-    # We surely need to alter the database
-    if params[:graduate_program] == "PhD"
-      @person.masters_program = "PhD"
-    else
-      @person.masters_program = params[:masters_program]
-    end
-    @person.masters_track = params[:se_track] if @person.masters_program!="PhD"
 
     respond_to do |format|
       if @person.save
