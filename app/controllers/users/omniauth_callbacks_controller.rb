@@ -16,6 +16,7 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
     omniauth = env["omniauth.auth"]
     email = omniauth["info"]["email"]
 
+    # Check if user exists
     if @user
       remember_me(@user)
       flash[:notice] = I18n.t "devise.omniauth_callbacks.success", :kind => omniauth['provider'], :email => switch_sv_to_ad(email)
