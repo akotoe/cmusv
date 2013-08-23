@@ -112,8 +112,8 @@
                   <span class="help_text">(Not created yet)</span>
                   <%= select_tag( 'active_directory_account_operation', options_for_select([['Select action', 'none'], ['Create account', 'create_account'], ['Resend new token', 'send_new_token']])) %>
               <% else %>
-                  <%= select_tag( 'active_directory_account_operation', options_for_select([['Select action', 'none'], ['Disable account', 'disable_account']])) %> <br/>
                   <span class="help_text">(Account created on <%=person.active_directory_account_created_at%>)</span>
+                  <%= select_tag( 'active_directory_account_operation', options_for_select([['Select action', 'none'], ['Disable account', 'disable_account']])) %> <br/>
             <% end %>
             </td>
         </tr>
