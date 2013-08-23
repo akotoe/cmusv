@@ -337,7 +337,7 @@ class PeopleController < ApplicationController
           flash[:error] = "Please update or verify your (social handles or biography) and your contact information"
         end
 
-        if active_directory_account_operation == "create_account"
+        if active_directory_account_operation == "create_account" || active_directory_account_operation.nil?
           active_directory_service = ActiveDirectory.new
           message = active_directory_service.create_account(@person)
 
