@@ -26,7 +26,7 @@ def switch_sv_to_west(email_address)
   return name+"@"+resolve_to_domain(domain)
 end
 
-# Return domain name if given an alias
+# Return domain name if given an alias domain
 def resolve_to_domain(host_name)
  return (host_name == "sv.cmu.edu") ? "west.cmu.edu" : host_name
 end
