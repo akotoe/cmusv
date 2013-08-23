@@ -129,7 +129,7 @@ class ActiveDirectory
 
   # Format email with correct domain
   def format_email_domain(email)
-    return "#{email.split('@')[0]}@#{AD_DOMAIN}"
+    return switch_sv_to_west("#{email.split('@')[0]}@#{GOOGLE_DOMAIN}")
   end
 
   # Return organization units
