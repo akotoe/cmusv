@@ -225,7 +225,7 @@ class PeopleController < ApplicationController
     @person.masters_program = params[:program]
     @person.expires_at = params[:expires_at]
 
-    if Rails.env.development?
+    if Rails.env.development? || GOOGLE_DOMAIN=='ad.sv.cmu.edu'
       @domain = GOOGLE_DOMAIN
     else
       @domain = "sv.cmu.edu"

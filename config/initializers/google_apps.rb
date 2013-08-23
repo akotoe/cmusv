@@ -3,6 +3,9 @@
 
 GOOGLE_USERNAME = ENV['GOOGLE_USERNAME'] || "team.deming@sandbox.sv.cmu.edu"
 GOOGLE_PASSWORD = ENV['GOOGLE_PASSWORD'] || "MfSE@sv"
+
+# This is the preferred name for the Google Domain, in production, it is sv.cmu.edu, which is an alias to the domain
+# west.cmu.edu. Which is why translations are performed in google_apps.rb
 GOOGLE_DOMAIN = ENV['GOOGLE_DOMAIN'] || "sandbox.sv.cmu.edu"
 
 require 'gappsprovisioning/provisioningapi'
@@ -20,10 +23,18 @@ end
 def switch_sv_to_west(email_address)
   return nil if email_address.nil?
   (name, domain) = email_address.split('@')
-  if(domain == "sv.cmu.edu")
-    email_address = name + "@west.cmu.edu"
-  end
-  return email_address
+  return name+"@"+resolve_to_domain(domain)
+end
+
+# Return domain name if given an alias
+def resolve_to_domain(host_name)
+ return (host_name == "sv.cmu.edu") ? "west.cmu.edu" : host_name
+end
+
+# Authenticating domain for hostname
+def resolve_to_authenticating_domain(host_name)
+   host_name = resolve_to_domain(host_name)
+   return (host_name == "sandbox.sv.cmu.edu") ? "west.cmu.edu" : host_name
 end
 
 def switch_west_to_sv(email_address)

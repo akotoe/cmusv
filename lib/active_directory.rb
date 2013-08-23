@@ -1,7 +1,7 @@
 require 'net/ldap'
 
 # Domain of the Active Directory Server
-AD_DOMAIN = ENV['AD_DOMAIN'] || "sandbox.sv.cmu.edu"
+AD_DOMAIN = ENV['AD_DOMAIN'] || "ad.sv.cmu.edu"
 
 # This class provides active directory services
 class ActiveDirectory
@@ -57,9 +57,9 @@ class ActiveDirectory
   def ldap_attributes(user)
     attributes = {
         :cn => user.human_name,
-        :mail => format_email_domain(user.email),
+        :mail => user.email,
         :objectclass => ["top", "person", "organizationalPerson", "user"],
-        :userPrincipalName => format_email_domain(user.email),
+        :userPrincipalName => format_email_to_ad_domain(user.email),
         :unicodePwd => password_encode('Just4now' + Time.now.to_f.to_s[-4, 4]),
         :userAccountControl => "512",
         :sn => user.last_name,
@@ -127,9 +127,9 @@ class ActiveDirectory
     end
   end
 
-  # Format email with a preferred domain
-  def format_email_domain(email)
-    return "#{email.split('@')[0]}@ad.sv.cmu.edu"
+  # Format email with a active directory domain
+  def format_email_to_ad_domain(email)
+    return "#{email.split('@')[0]}@#{AD_DOMAIN}"
   end
 
   # Return organization units
@@ -137,7 +137,6 @@ class ActiveDirectory
     if self.bind
 
       @sub_org = ""
-
       if !sub_org.blank?
         @sub_org = "ou=#{sub_org},"
       end
@@ -157,8 +156,8 @@ class ActiveDirectory
           units.push(entry.distinguishedname[0])
         end
       end
-      return units
 
+      return units
     else
       return false
     end
