@@ -75,7 +75,7 @@ class ActiveDirectory
 
     if user.is_staff
       if !user.masters_program.blank? && organization_units("names","staff").include?(user.masters_program)
-        distinguished_name += "ou=" + user.masters_program + ",ou=Student,"
+        distinguished_name += "ou=" + user.masters_program + ",ou=Staff,"
       else
         distinguished_name += "ou=Staff,"
       end
