@@ -127,9 +127,9 @@ class ActiveDirectory
     end
   end
 
-  # Format email with correct domain
+  # Format email with a preferred domain
   def format_email_domain(email)
-    return switch_sv_to_west("#{email.split('@')[0]}@#{GOOGLE_DOMAIN}")
+    return "#{email.split('@')[0]}@ad.sv.cmu.edu"
   end
 
   # Return organization units
