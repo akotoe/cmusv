@@ -129,7 +129,7 @@ class ActiveDirectory
 
   # Format email with a preferred domain
   def format_email_domain(email)
-    return "#{email.split('@')[0]}@ad.sv.cmu.edu"
+    return "#{email.split('@')[0]}@west.cmu.edu"
   end
 
   # Return organization units
