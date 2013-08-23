@@ -13,40 +13,6 @@
 
 ActiveRecord::Schema.define(:version => 20130820050158) do
 
-  create_table "ad_group_memberships", :force => true do |t|
-    t.integer  "ad_user_id"
-    t.integer  "ad_group_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  create_table "ad_groups", :force => true do |t|
-    t.string   "name"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  create_table "ad_organization_units", :force => true do |t|
-    t.string   "name"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  create_table "ad_users", :force => true do |t|
-    t.string   "principal_name"
-    t.datetime "account_expires"
-    t.string   "distinguished_name"
-    t.string   "given_name"
-    t.string   "email"
-    t.string   "objectclass"
-    t.string   "user_account_control"
-    t.string   "sur_name"
-    t.string   "display_name"
-    t.integer  "ad_organization_unit_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
   create_table "assignments", :force => true do |t|
     t.string   "name"
     t.float    "maximum_score"
