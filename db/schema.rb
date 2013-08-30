@@ -11,10 +11,11 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130829185350) do
+ActiveRecord::Schema.define(:version => 20130829200618) do
 
   create_table "ad_organization_units", :force => true do |t|
     t.string   "distinguishedname"
+    t.string   "objectguid"
     t.string   "whenchanged"
     t.datetime "created_at"
     t.datetime "updated_at"

@@ -29,7 +29,7 @@ class ActiveDirectory
       return "Domain (" + domain + ") is not the same as the google domain (" + GOOGLE_DOMAIN + ")"
     end
 
-    if self.bind
+    if bind
       @connection.add(:dn => ldap_distinguished_name(user), :attributes => ldap_attributes(user))
       message = @connection.get_operation_result.message
       if message == "Success" || message == "Entry Already Exists"
@@ -121,7 +121,7 @@ class ActiveDirectory
 
   # Reset active directory password
   def reset_password(user, new_pass)
-    if self.bind
+    if bind
       distinguished_name = ldap_distinguished_name(user)
       @connection.replace_attribute distinguished_name, :unicodePwd, password_encode(new_pass)
       return @connection.get_operation_result.message
@@ -137,7 +137,7 @@ class ActiveDirectory
 
   # Return names of organization units
   def organization_units
-    if self.bind
+    if bind
       units = []
       AdOrganizationUnit.find_each do |local_entry|
           name = local_entry.distinguishedname.split(',')[0]
@@ -149,9 +149,12 @@ class ActiveDirectory
     end
   end
 
-  # Update organization units cache table
+  # Update organization units cache table if records are more than one day old
   def update_organization_units
-    if self.bind
+
+    oldest_update = AdOrganizationUnit.order('created_at').last
+
+    if bind && oldest_update.created_at>1.day.ago
       filter = Net::LDAP::Filter.eq("objectClass", "organizationalunit")
       results = @connection.search(:base =>"ou=Sync,"+base_distinguished_name, :filter => filter)
       remote_organization_units = Hash.new
