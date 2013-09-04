@@ -154,7 +154,7 @@ class ActiveDirectory
 
     oldest_update = AdOrganizationUnit.order('created_at').last
 
-    if bind && !oldest_update.nil? && oldest_update.created_at>1.day.ago
+    if bind && (oldest_update.nil? || oldest_update.created_at<1.day.ago)
       filter = Net::LDAP::Filter.eq("objectClass", "organizationalunit")
       results = @connection.search(:base =>"ou=Sync,"+base_distinguished_name, :filter => filter)
       remote_organization_units = Hash.new
