@@ -1,7 +1,7 @@
 require 'net/ldap'
 
 # Domain of the Active Directory Server
-AD_DOMAIN = ENV['AD_DOMAIN'] || "ad.sv.cmu.edu"
+AD_DOMAIN = ENV['AD_DOMAIN'] || "ds.sv.cmu.edu"
 
 # This class provides active directory services
 class ActiveDirectory
@@ -12,6 +12,9 @@ class ActiveDirectory
     @connection = Net::LDAP.new(:host => LDAPConfig.host, :port => LDAPConfig.port)
     @connection.encryption(:method => :simple_tls) unless !LDAPConfig.is_encrypted?
     @connection.auth LDAPConfig.username, LDAPConfig.password unless LDAPConfig.username.nil? || LDAPConfig.password.nil?
+
+    # Update organization units
+    update_organization_units
   end
 
   # Create an Active Directory account for a user
@@ -26,7 +29,7 @@ class ActiveDirectory
       return "Domain (" + domain + ") is not the same as the google domain (" + GOOGLE_DOMAIN + ")"
     end
 
-    if self.bind
+    if bind
       @connection.add(:dn => ldap_distinguished_name(user), :attributes => ldap_attributes(user))
       message = @connection.get_operation_result.message
       if message == "Success" || message == "Entry Already Exists"
@@ -74,13 +77,13 @@ class ActiveDirectory
     distinguished_name = "cn=#{user.human_name},"
 
     if user.is_staff
-      if !user.masters_program.blank? && organization_units("names","staff").include?(user.masters_program)
+      if !user.masters_program.blank? && organization_units.include?(user.masters_program)
         distinguished_name += "ou=" + user.masters_program + ",ou=Staff,"
       else
         distinguished_name += "ou=Staff,"
       end
     elsif user.is_student
-      if !user.masters_program.blank? && organization_units("names","student").include?(user.masters_program)
+      if !user.masters_program.blank? && organization_units.include?(user.masters_program)
         distinguished_name += "ou=" + user.masters_program + ",ou=Student,"
       else
         distinguished_name += "ou=Student,"
@@ -118,7 +121,7 @@ class ActiveDirectory
 
   # Reset active directory password
   def reset_password(user, new_pass)
-    if self.bind
+    if bind
       distinguished_name = ldap_distinguished_name(user)
       @connection.replace_attribute distinguished_name, :unicodePwd, password_encode(new_pass)
       return @connection.get_operation_result.message
@@ -132,35 +135,58 @@ class ActiveDirectory
     return "#{email.split('@')[0]}@#{AD_DOMAIN}"
   end
 
-  # Return organization units
-  def organization_units(format="", sub_org="")
-    if self.bind
-
-      @sub_org = ""
-      if !sub_org.blank?
-        @sub_org = "ou=#{sub_org},"
-      end
-
-      filter = Net::LDAP::Filter.eq("objectClass", "organizationalunit")
-      results = @connection.search(:base =>@sub_org+"ou=Sync,"+base_distinguished_name, :filter => filter)
+  # Return names of organization units
+  def organization_units
+    if bind
       units = []
-
-      # Return organization unit names or distinguished names
-      if format == "names"
-        results.each do |entry|
-          name = entry.distinguishedname[0].split(',')[0]
-          units.push(name[3..name.length])
-        end
-      else
-        results.each do |entry|
-          units.push(entry.distinguishedname[0])
-        end
+      AdOrganizationUnit.find_each do |local_entry|
+        name = local_entry.distinguishedname.split(',')[0]
+        units.push(name[3..name.length])
       end
-
       return units
     else
       return false
     end
   end
+
+  # Update organization units cache table if records are more than one day old
+  def update_organization_units
+
+    oldest_update = AdOrganizationUnit.order('created_at').last
+
+    if bind && !oldest_update.nil? && oldest_update.created_at>1.day.ago
+      filter = Net::LDAP::Filter.eq("objectClass", "organizationalunit")
+      results = @connection.search(:base =>"ou=Sync,"+base_distinguished_name, :filter => filter)
+      remote_organization_units = Hash.new
+      local_organization_units = Hash.new
+
+      # Build hash for local entries
+      AdOrganizationUnit.find_each do |local_entry|
+        local_organization_units[local_entry.distinguishedname] = local_entry.whenchanged
+      end
+
+      # Add new entries to local database
+      results.each do |remote_entry|
+        # Build hash for remote entries
+        remote_organization_units[remote_entry.distinguishedname[0]] = remote_entry.whenchanged[0]
+        if !local_organization_units.has_key?(remote_entry.distinguishedname[0])
+          new_organization_unit = AdOrganizationUnit.new
+          new_organization_unit.distinguishedname = remote_entry.distinguishedname[0]
+          new_organization_unit.whenchanged = remote_entry.whenchanged[0]
+          new_organization_unit.save!
+        end
+      end
+
+      # Remove old entries from local database
+      local_organization_units.each do |local_entry|
+        if !remote_organization_units.has_key?(local_entry[0])
+          AdOrganizationUnit.find_by_distinguishedname(local_entry[0]).destroy
+        end
+      end
+    else
+      return false
+    end
+  end
+
 end
 
